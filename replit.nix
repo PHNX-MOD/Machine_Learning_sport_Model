@@ -1,5 +1,6 @@
 { pkgs }: {
 	deps = [
-		pkgs.R
+		pkgs.openssh_with_kerberos
+  pkgs.R
 	];
 }

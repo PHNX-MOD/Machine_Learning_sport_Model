@@ -6,4 +6,4 @@ data <- dbGetQuery(con, query)
 
 sqldbDisconnect(con)
 
-#changes to be made
+#changes to be made from replt

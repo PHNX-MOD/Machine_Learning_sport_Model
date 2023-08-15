@@ -8,6 +8,9 @@ git add .
 git commit -m "change in the file"
 git push origin
 
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
 
 pushing from other branches sean_main or modith_main
 after making changes checkout to the personal branch

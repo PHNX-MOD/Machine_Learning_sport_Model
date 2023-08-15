@@ -3,3 +3,9 @@ git config --global user.email "your.email@example.com"
 
 ssh-keygen -t rsa -b 4096 -C "your.email@example.com"
 
+git init
+git add .
+git commit -m "change in the file"
+git push origin
+
+

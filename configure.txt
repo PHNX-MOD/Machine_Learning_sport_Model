@@ -9,3 +9,12 @@ git commit -m "change in the file"
 git push origin
 
 
+pushing from other branches sean_main or modith_main
+after making changes checkout to the personal branch
+
+git checkout sean_main
+git add .
+git commit -m "Add new feature"
+git push origin sean_main
+
+

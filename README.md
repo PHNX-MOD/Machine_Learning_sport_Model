@@ -1,12 +1,4 @@
-# Regression_SB
-Project to solve regression problem with supervised learning
+# Machine Learning Sport model
+The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 
 
-## RStudio
-go to terminal and pull the repo into the desired path <sub> cd /cloud/project/path/</sub> 
-
-##Git clone the repo, 
-in terminal > <sub> https://github.com/PHNX-MOD/Regression_SB </sub> 
-
-##Connecting to Database(SQLlite online) 
-**https://sqliteonline.com/**
-
+present setup and working https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset?select=cbb.csv

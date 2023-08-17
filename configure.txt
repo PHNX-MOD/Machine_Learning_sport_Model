@@ -1,0 +1,32 @@
+ssh-keygen -t rsa -b 4096 -C "your.email@example.com"
+
+** MISSING FILES IN THE LOCAL DIR
+git reset --hard FETCH_HEAD
+git reset --hard FETCH_HEAD
+
+**COMMON PRACTICE
+git init
+git add .
+git commit -m "change in the file"
+git push origin
+
+** IF GIT ASKS FOR CREDENTIALS
+git config --global user.email "you@example.com"
+git config --global user.name "Your Name"
+
+
+** pushing from other branches sean_main or modith_main
+after making changes checkout to the personal branch
+
+git checkout sean_main
+git add .
+git commit -m "Add new feature"
+git push origin sean_main
+
+
+** Authentication error issue
+git remote add origin main (url)( https://tokenhere@github.com/user_name/repo_name.git)
+git clone https://tokenhere@github.com/user_name/repo_name.git
+
+
+chabnge

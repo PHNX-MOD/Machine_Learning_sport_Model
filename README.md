@@ -1,4 +1,9 @@
 # Machine Learning Sport model
+
+# Table of Contents
+[About](#About)
+
+## About
 The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 
 
 ## working files

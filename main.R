@@ -11,3 +11,5 @@ dbDisconnect(con)
 Sql_tables <- c("cbb", "cbb13", "cbb14", "cbb15",
                "cbb16", "cbb17" ,"cbb18", "cbb19",
                "cbb20" ,"cbb21", "cbb22" ,"cbb23")
+
+test pull 

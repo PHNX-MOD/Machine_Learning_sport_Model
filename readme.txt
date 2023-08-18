@@ -7,4 +7,12 @@ Milestones
 * Create a dashboard using R-Shiny and Django
 * Create a docker file
 
+** Projects in detail **
+explore the CBB dataset
+
+
+
+
+
+
 Work in progress her in the project board --->  https://github.com/users/PHNX-MOD/projects/1/views/1

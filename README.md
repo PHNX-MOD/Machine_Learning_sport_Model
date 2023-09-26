@@ -8,7 +8,10 @@
 The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 
 
 ## working files
-[main.R](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.R) & [mainPython.ipynb](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/mainPython.ipynb)
+
+Exploratory data analysis <br />
+[main.R](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.R) <br />
+[mainPython.ipynb](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/mainPython.ipynb)
 
 ## Working Directories 
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelPyDjango

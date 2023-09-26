@@ -33,7 +33,7 @@ for (csv_file in csv_files) {
 dbDisconnect(con)
 
 ```
-### Datasets conents 
+### Datasets contents 
 Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:
 “<Team 1> v <Team 2> <Date>”
 Please note, that if the game is played at the home of one of the teams (IsNeutralSite=0), then Team 1 will be

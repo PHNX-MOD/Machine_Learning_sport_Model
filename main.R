@@ -1,15 +1,34 @@
-install.packages("RSQLite")
-library(RSQLite)
+con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
+
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
-result <- dbGetQuery(con, "SELECT * FROM cbb")
+result <- dbGetQuery(con, "SELECT * FROM box_scores")
 dbDisconnect(con)
 
 
+folder <- "."
 
-#list of tables 
-Sql_tables <- c("cbb", "cbb13", "cbb14", "cbb15",
-               "cbb16", "cbb17" ,"cbb18", "cbb19",
-               "cbb20" ,"cbb21", "cbb22" ,"cbb23")
+#Get a list of the CSV files in the folder
+csv_files <- list.files('.', pattern = "\\.csv$")
 
-test pull 
+
+for (csv_file in csv_files) {
+  df <- read.csv(file.path(folder, csv_file))
+  
+  table_name <- gsub("\\.csv$", "", csv_file)
+  
+  dbWriteTable(con, table_name, df)
+}
+
+
+
+df <- read.csv('box_scores.csv')
+
+dbWriteTable(con, 'box_scores' , df)
+
+gsub("\\.csv$", "", "box_scores.csv")
+
+
+#try this 
+
+

@@ -1,7 +1,7 @@
 # Machine Learning Sport model
 
 # Table of Contents
-[About](#About)
+[About](#About) <br />
 [Exploratory data analysis](#Exploratory-data-analysis)
 
 ## About

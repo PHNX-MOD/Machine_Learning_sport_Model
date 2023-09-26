@@ -41,14 +41,14 @@ listed as the home team.
 
 1. box scores.csv
 Box scores are tables that represent the match statistics at a player/team level. This dataset in particular, is displaying the main basketball statistics for each fixture, at the team level. There will be data on:
-• Number of shots made
-• Number of shots attempted
-• Number of rebounds
-• Number of shots assisted
-• Number of defensive steals forced
-• Number of opponent shots blocked
-• Number of turnovers committed
-• Number of fouls committed
+• Number of shots made <br />
+• Number of shots attempted <br />
+• Number of rebounds <br />
+• Number of shots assisted <br />
+• Number of defensive steals forced <br />
+• Number of opponent shots blocked <br />
+• Number of turnovers committed <br />
+• Number of fouls committed <br />
 
 2. fixture information.csv
 Additional information of each of the fixtures that may be useful. The TipOff time is listed in Eastern Time. 

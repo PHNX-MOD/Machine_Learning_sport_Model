@@ -2,7 +2,7 @@
 
 # Table of Contents
 [About](#About)
-[Exploratory data analysis](#Exploratory data analysis)
+[Exploratory data analysis](#https://github.com/PHNX-MOD/Machine_Learning_sport_Model/edit/main/README.md#Exploratory data analysis)
 
 ## About
 The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 

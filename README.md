@@ -13,7 +13,9 @@ The aim is to create a machine-learning model using Python and R with front-end 
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelPyDjango
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelRShiny
 
-
+## Exploratory data analysis
+ 2 years of NCAA data is added into the database (mydatabase.db)
+ ```con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")```
 
 
 

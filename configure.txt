@@ -29,4 +29,7 @@ git remote add origin main (url)( https://tokenhere@github.com/user_name/repo_na
 git clone https://tokenhere@github.com/user_name/repo_name.git
 
 
-chabnge
+** Pushing Changes in Terminal
+git add . 
+git commit -m (needs to be a commit message along with this line so I can push through to repo)
+git push

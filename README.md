@@ -12,13 +12,13 @@ The algorithm's reach extends beyond its technical prowess, as it offers seamles
 
 As an initial step, the project delves into the rich repository of NCAA basketball data, serving as the foundation for an in-depth exploratory data analysis. This analysis not only unravels the intricacies of NCAA basketball but also lays the groundwork for the subsequent stages of model development and refinement.
 
-## working files
+#### working files
 
 Exploratory data analysis <br />
 [main.R](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.R) <br />
 [main.ipynb](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.ipynb)
 
-## Working Directories 
+#### Working Directories 
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelPyDjango
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelRShiny
 

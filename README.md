@@ -1,10 +1,10 @@
 # Machine Learning Sport model
 
 # Table of Contents
-[About](#About) <br />
-[Exploratory data analysis](#Exploratory-data-analysis)
+[1.About](#About) <br />
+[2.Exploratory data analysis](#Exploratory-data-analysis)
 
-## About
+## 1.About
 The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 
 The overarching goal is to create a predictive model capable of unveiling the intricate relationship between various game-related features and the elusive outcomes of basketball matches. In pursuit of this objective, the algorithm is meticulously crafted using two of the most potent programming languages in data science and analysis, Python and R.
 
@@ -22,7 +22,7 @@ Exploratory data analysis <br />
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelPyDjango
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelRShiny
 
-## Exploratory data analysis
+## 2.Exploratory data analysis
 The data((mydatabase.db) represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years.
 The objective will be to build a model that is able to predict the winners for the fixtures on the 25th of February, 2023. 
 
@@ -60,7 +60,7 @@ db_connection.close()
 
 ```
 
-### Datasets contents 
+#### 2.a Datasets contents 
 Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:
 “<Team 1> v <Team 2> <Date>”
 Please note, that if the game is played at the home of one of the teams (IsNeutralSite=0), then Team 1 will be

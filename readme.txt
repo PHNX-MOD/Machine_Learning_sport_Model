@@ -10,6 +10,16 @@ Milestones
 ** Projects in detail **
 explore the CBB dataset
 
+Exploratory data analysis
+
+how to proceed ?? 
+Data Preparation:
+Data Preprocessing:
+Model Selection:
+Model Training:
+Model Evaluation:
+Prediction for February 25, 2023:
+
 
 
 

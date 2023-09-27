@@ -34,8 +34,27 @@ for (csv_file in csv_files) {
   dbWriteTable(con, table_name, df)
 }
 dbDisconnect(con)
+```
+Writing all the csv data into a database using dbConnect in python, 
+```
+# Folder containing the CSV files
+folder = "."
+
+# Get a list of the CSV files in the folder
+csv_files = [f for f in os.listdir(folder) if f.endswith(".csv")]
+
+# Connect to the database
+db_connection = sqlite3.connect('mydatabase.db')
+
+for csv_file in csv_files:
+    df = pd.read_csv(os.path.join(folder, csv_file))   # Read the CSV file into a DataFrame   
+    table_name = os.path.splitext(csv_file)[0]         # Extract the table name from the CSV file name    
+    df.to_sql(table_name, db_connection, if_exists='replace', index=False)  # Write the DataFrame to the SQLite database
+
+db_connection.close()
 
 ```
+
 ### Datasets contents 
 Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:
 “<Team 1> v <Team 2> <Date>”

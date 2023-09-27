@@ -6,6 +6,11 @@
 
 ## About
 The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 
+The overarching goal is to create a predictive model capable of unveiling the intricate relationship between various game-related features and the elusive outcomes of basketball matches. In pursuit of this objective, the algorithm is meticulously crafted using two of the most potent programming languages in data science and analysis, Python and R.
+
+The algorithm's reach extends beyond its technical prowess, as it offers seamless access through both Shiny and Django frameworks, providing a user-friendly front-end interface that empowers enthusiasts, analysts, and decision-makers to harness the insights buried within the data.
+
+As an initial step, the project delves into the rich repository of NCAA basketball data, serving as the foundation for an in-depth exploratory data analysis. This analysis not only unravels the intricacies of NCAA basketball but also lays the groundwork for the subsequent stages of model development and refinement.
 
 ## working files
 

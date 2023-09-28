@@ -23,6 +23,9 @@ git add .
 git commit -m "Add new feature"
 git push origin sean_main
 
+** Hard git pull / this pulls and makes changes in the local repo
+git fetch --all
+git reset --hard origin
 
 ** Authentication error issue
 git remote add origin main (url)( https://tokenhere@github.com/user_name/repo_name.git)

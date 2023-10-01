@@ -40,35 +40,41 @@ skim(df_fixture_information)
 skim(df_test_fixtures)
 skim(df_test_fixtures_actuals)
 
-colnames(df_box_scores)[1] <- "TeamAvTeamB"
+FixtureKey <- "LIPSCO v A PEAY 14-Jan-2023"
 
-headBoxScores <- head(df_box_scores, 5)
-
-df_box_scores%>%mutate(TeamName = strsplit(trimws(gsub("(?i)v", ",", df_box_scores[1])), ",")[[1]][Team])
-
-
+splitfun = unlist(strsplit(df_box_scores$FixtureKey[1], " "))
+team_names <- paste(unlist(strsplit(df_box_scores$FixtureKey[1], " "))[1:4], collapse = " ")
+date <- unlist(strsplit(df_box_scores$FixtureKey[1], " "))[5]
 
 
-input_string <- "LIPSCO v A PEAY 14-Jan-2023"
-# Split the string at "v" (case-insensitive) and remove leading/trailing spaces
-split_string <- trimws(gsub("(?i)v", ",", input_string))
+dfBoxScoresHead <- head(df_box_scores, 5)
 
-# Split the result at the comma to get the team names
-team_names <- strsplit(split_string, ",")[[1]]
-
-
-strsplit(trimws(gsub("(?i)v", ",", input_string)), ",")[[1]][1]
+df_box_scores %>%rowwise() %>%
+  mutate(TeamAvTeamB = paste(unlist(strsplit(as.character(FixtureKey), " "))[1:4], collapse = " "))%>%
+  mutate(TeamName = strsplit(trimws(gsub("(?i)v", ",", TeamAvTeamB)), ",")[[1]][Team])%>%
+  select(!TeamAvTeamB)%>%
+  select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
 
 
-
-
-
-split_string <- unlist(strsplit(input_string, " "))
-
-# Extract the team names and date
-team_names <- paste(split_string[1:4], collapse = " ")
-date <- split_string[5]
-
-
-
-
+# input_string <- "LIPSCO v A PEAY 14-Jan-2023"
+# # Split the string at "v" (case-insensitive) and remove leading/trailing spaces
+# split_string <- trimws(gsub("(?i)v", ",", input_string))
+# 
+# # Split the result at the comma to get the team names
+# team_names <- strsplit(split_string, ",")[[1]]
+# 
+# 
+# strsplit(trimws(gsub("(?i)v", ",", input_string)), ",")[[1]][1]
+# 
+# 
+# 
+# 
+# 
+# split_string <- unlist(strsplit(input_string, " "))
+# 
+# # Extract the team names and date
+# team_names <- paste(split_string[1:4], collapse = " ")
+# date <- split_string[5]
+# 
+# 
+# 

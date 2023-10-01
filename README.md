@@ -67,7 +67,7 @@ Please note, that if the game is played at the home of one of the teams (IsNeutr
 listed as the home team.
 
 1. box scores.csv
-Box scores are tables that represent the match statistics at a player/team level. This dataset in particular, is displaying the main basketball statistics for each fixture, at the team level. There will be data on:
+Box scores are tables that represent the match statistics at a player/team level. This dataset in particular, is displaying the main basketball statistics for each fixture, at the team level. There will be data on:<br />
 • Number of shots made<br/>
 • Number of shots attempted <br />
 • Number of rebounds <br />

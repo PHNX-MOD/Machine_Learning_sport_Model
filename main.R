@@ -1,6 +1,24 @@
-library(RSQLite)
-library(dplyr)
+library(tidymodels)
 library(skimr)
+library(rsample)
+
+starwars
+
+skim(starwars)
+view(starwars)
+
+datareg <- starwars%>%select(height, mass, gender)
+
+# we need to sample our data i,e split into test and train, so we use R sample
+
+datareg_split <- initial_split(datareg)
+datareg_train <- training(datareg_split)
+datareg_test <- testing(datareg_split)
+
+
+
+library(RSQLite)
+
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
 dbDisconnect(con)
@@ -17,33 +35,40 @@ df_fixture_information <- dbGetQuery(con, "SELECT * FROM fixture_information")
 df_test_fixtures <- dbGetQuery(con, "SELECT * FROM test_fixtures")
 df_test_fixtures_actuals <- dbGetQuery(con, "SELECT * FROM test_fixtures_actuals")
 
-
-
-#data Preprocessing 
-
 skim(df_box_scores)
 skim(df_fixture_information)
 skim(df_test_fixtures)
 skim(df_test_fixtures_actuals)
 
-# box scores:  split into test and train
+colnames(df_box_scores)[1] <- "TeamAvTeamB"
 
-df_box_scores_split <- initial_split(df_box_scores)
-df_box_scores_train <- training(df_box_scores_split)
-df_box_scores_test <- testing(df_box_scores_split)
+headBoxScores <- head(df_box_scores, 5)
 
-skim(df_box_scores_train)
+df_box_scores%>%mutate(TeamName = strsplit(trimws(gsub("(?i)v", ",", df_box_scores[1])), ",")[[1]][Team])
 
 
-# df_test_fixtures_actuals : split into test and train
 
-df_test_fixtures_actuals_split <- initial_split(df_test_fixtures_actuals)
-df_test_fixtures_actuals_train <- training(df_test_fixtures_actuals_split)
-df_test_fixtures_actuals_test <- testing(df_test_fixtures_actuals_split)
 
-#checking missing values
-skim(df_test_fixtures_actuals_train)
-any(is.na(df_test_fixtures_actuals_train))
-colSums(is.na(df_test_fixtures_actuals_train)) #TeamHandicap NA values 
+input_string <- "LIPSCO v A PEAY 14-Jan-2023"
+# Split the string at "v" (case-insensitive) and remove leading/trailing spaces
+split_string <- trimws(gsub("(?i)v", ",", input_string))
+
+# Split the result at the comma to get the team names
+team_names <- strsplit(split_string, ",")[[1]]
+
+
+strsplit(trimws(gsub("(?i)v", ",", input_string)), ",")[[1]][1]
+
+
+
+
+
+split_string <- unlist(strsplit(input_string, " "))
+
+# Extract the team names and date
+team_names <- paste(split_string[1:4], collapse = " ")
+date <- split_string[5]
+
+
 
 

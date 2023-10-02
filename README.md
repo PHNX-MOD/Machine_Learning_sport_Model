@@ -87,5 +87,10 @@ The set of FixtureKeys on the 25th of February, 2023, to predict the fixture out
 This data shows what actually happened for the fixtures to predict, as well as some additional betting information provided by bookmakers. (Guide on TeamHandicap: -7.0
 would mean that the team was predicted to win by 7 points, and +3.5 would mean that the team was predicted to lose by 3.5 points.)
 
+#### 2.b Data Preparation
+The first step of any machine learning project is to analyse the raw data and use statistical methods to try and understand the meaning and relationships in the dataset. This requires that we check for any missing 
+values and anomalies that would prevent us from using all methods at our disposal. And for this stage of the project only the 'box_scores' dataframe would be the most important as it contains the most relevant
+and impactful stats that would help acheive the objective of predictting future results. Using libraries such as pandas and numpy to manipulate these dataframes will be the next 
+
 
 more details regarding the project are in readme.text file-->  https://github.com/PHNX-MOD/Regression_SB/blob/main/readme.txt

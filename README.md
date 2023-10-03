@@ -72,7 +72,7 @@ dfBoxScores <-df_box_scores %>%rowwise()%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
 
-# ====================Methods two splitString ============================================
+# ====================Method two splitString ============================================
 
 dfBoxScores <- df_box_scores %>%rowwise()%>%
   mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%

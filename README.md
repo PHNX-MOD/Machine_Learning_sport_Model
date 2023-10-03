@@ -59,6 +59,30 @@ for csv_file in csv_files:
 db_connection.close()
 
 ```
+Lot of cleaning is done in the SQL query instead of dplyr or Pandas. The alternate code is added here in R(dplyr)
+```
+# ====================Method one splitString ===============================================
+#df_box_scores is the table from box_scores SELECT * FROM box_scores;
+dfBoxScores <-df_box_scores %>%rowwise()%>%
+  mutate(
+    SplittedString = strsplit(FixtureKey, " "),
+    TeamAvTeamB = paste(unlist(SplittedString[-length(SplittedString)]), collapse = " ")
+  )%>%
+  mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
+  select(!TeamAvTeamB)%>%
+  select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
+
+# ====================Methods two splitString ============================================
+
+dfBoxScores <- df_box_scores %>%rowwise()%>%
+  mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%
+  mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
+  select(!TeamAvTeamB)%>%
+  select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
+```
+
+
+
 
 #### 2.a Datasets contents 
 Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:

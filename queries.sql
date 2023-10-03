@@ -1,4 +1,3 @@
-qurt1 <- "
 WITH TeamAvTeamB AS (
     SELECT
         FixtureKey,
@@ -28,5 +27,5 @@ SELECT
     PF
 FROM
     TeamAvTeamB
-    JOIN box_scores ON TeamAvTeamB.FixtureKey = box_scores.FixtureKey;"
+    JOIN box_scores ON TeamAvTeamB.FixtureKey = box_scores.FixtureKey;
 

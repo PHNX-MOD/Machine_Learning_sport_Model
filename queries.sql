@@ -6,6 +6,7 @@ WITH TeamAvTeamB AS (
         box_scores
 )
 SELECT
+    TeamAvTeamB.FixtureKey AS FixtureKey, 
     CASE
         WHEN Team = 1 THEN SUBSTR(TeamAvTeamB, 1, INSTR(TeamAvTeamB, 'v') - 1)
         WHEN Team = 2 THEN SUBSTR(TeamAvTeamB, INSTR(TeamAvTeamB, 'v') + 1)

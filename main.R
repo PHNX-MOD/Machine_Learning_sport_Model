@@ -64,7 +64,7 @@ dfBoxScores <-dfBoxScores%>%group_by(TeamName)%>%
   summarise(X2PA = mean(X2PA))
 
 
-# ====================Method two splitString ============================================
+# ====================Methods two splitString ============================================
 
 
 
@@ -77,6 +77,52 @@ dfBoxScores2 <- df_box_scores %>%rowwise()%>%
 
 dfBoxScores2 <-dfBoxScores2%>%group_by(TeamName)%>%
   summarise(X2PA = mean(X2PA))
+
+
+
+con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
+
+createTemp1Table <- "CREATE TEMP TABLE temp1 AS
+SELECT
+    FixtureKey,
+    SUBSTR(FixtureKey, 1, LENGTH(FixtureKey) - 12) AS TeamAvTeamB
+FROM
+    box_scores"
+
+createTemp2Table <- "CREATE TEMP TABLE temp2 AS
+SELECT
+    FixtureKey,
+    TeamAvTeamB,
+    TRIM(SUBSTR(TeamAvTeamB, 1, INSTR(TeamAvTeamB, 'v') - 1)) AS TeamName
+FROM
+    temp1"
+
+joinTemp1Temp2 <- "SELECT
+    df.Team,df.X2PM, df.X2PA, df.X3PM,df.X3PA,df.FTM, df.FTA,df.ORB,
+    df.DRB,df.AST,df.STL,df.BLK,df.TOV,df.PF,t2.TeamName
+FROM
+    box_scores AS df
+JOIN
+    temp2 AS t2
+ON
+    df.FixtureKey = t2.FixtureKey"
+
+
+
+dbExecute(con, createTemp2Table)
+dbGetQuery(con, joinTemp1Temp2)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

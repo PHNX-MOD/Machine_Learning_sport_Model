@@ -1,6 +1,7 @@
 library(tidymodels)
 library(skimr)
 library(rsample)
+library(purrr)
 
 starwars
 
@@ -47,34 +48,37 @@ team_names <- paste(unlist(strsplit(df_box_scores$FixtureKey[1], " "))[1:4], col
 date <- unlist(strsplit(df_box_scores$FixtureKey[1], " "))[5]
 
 
-dfBoxScoresHead <- head(df_box_scores, 5)
+# ====================Method one splitString ===============================================
 
-df_box_scores %>%rowwise() %>%
-  mutate(TeamAvTeamB = paste(unlist(strsplit(as.character(FixtureKey), " "))[1:4], collapse = " "))%>%
-  mutate(TeamName = strsplit(trimws(gsub("(?i)v", ",", TeamAvTeamB)), ",")[[1]][Team])%>%
+dfBoxScores <-df_box_scores %>%rowwise()%>%
+  mutate(
+    SplittedString = strsplit(FixtureKey, " "),
+    TeamAvTeamB = paste(unlist(SplittedString[-length(SplittedString)]), collapse = " ")
+  )%>%
+  mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
 
 
-# input_string <- "LIPSCO v A PEAY 14-Jan-2023"
-# # Split the string at "v" (case-insensitive) and remove leading/trailing spaces
-# split_string <- trimws(gsub("(?i)v", ",", input_string))
-# 
-# # Split the result at the comma to get the team names
-# team_names <- strsplit(split_string, ",")[[1]]
-# 
-# 
-# strsplit(trimws(gsub("(?i)v", ",", input_string)), ",")[[1]][1]
-# 
-# 
-# 
-# 
-# 
-# split_string <- unlist(strsplit(input_string, " "))
-# 
-# # Extract the team names and date
-# team_names <- paste(split_string[1:4], collapse = " ")
-# date <- split_string[5]
-# 
-# 
-# 
+dfBoxScores <-dfBoxScores%>%group_by(TeamName)%>%
+  summarise(X2PA = mean(X2PA))
+
+
+# ====================Method two splitString ============================================
+
+
+
+dfBoxScores2 <- df_box_scores %>%rowwise()%>%
+  mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%
+  mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
+  select(!TeamAvTeamB)%>%
+  select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
+
+
+dfBoxScores2 <-dfBoxScores2%>%group_by(TeamName)%>%
+  summarise(X2PA = mean(X2PA))
+
+
+
+
+

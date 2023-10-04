@@ -73,16 +73,19 @@ dfBoxScores <-df_box_scores %>%rowwise()%>%
     TeamAvTeamB = paste(unlist(SplittedString[-length(SplittedString)]), collapse = " ")
   )%>%
   mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
+  mutate(TeamName = trimws(TeamName))%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
 
 # ====================Method two splitString ============================================
 
-dfBoxScores <- df_box_scores %>%rowwise()%>%
+dfBoxScores2 <- df_box_scores %>%rowwise()%>%
   mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%
   mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
+  mutate(TeamName = trimws(TeamName))%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
+
 ```
 ### 2.c Datasets contents 
 Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:

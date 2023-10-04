@@ -24,7 +24,7 @@ https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelRShin
 
 ## 2.Exploratory data analysis
 The data((mydatabase.db) represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years.
-The objective will be to build a model that is able to predict the winners for the fixtures on the 25th of February, 2023. 
+The objective will be to build a model that is able to predict the winners for the fixtures on the SPECIFC DATE (**/**/****). Details of the dataset contents and goal is discussed in the section [2.c Datasets contents](#Datasets-contents)
 
 ### 2.a Data Preparation
  Writing all the csv data into a database using dbConnect in R, just as a practice to pull data from SQl

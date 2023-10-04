@@ -60,7 +60,7 @@ for csv_file in csv_files:
 db_connection.close()
 
 ```
-### 2.b Data Preporcessing
+### 2.b Data Preprocessing
 
 Lot of cleaning is done in the SQL query instead of dplyr or Pandas. The alternate code is added here in R(dplyr)
 ```

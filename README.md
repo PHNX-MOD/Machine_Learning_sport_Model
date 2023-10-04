@@ -26,6 +26,7 @@ https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelRShin
 The data((mydatabase.db) represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years.
 The objective will be to build a model that is able to predict the winners for the fixtures on the 25th of February, 2023. 
 
+### 2.a Data Preparation
  Writing all the csv data into a database using dbConnect in R, just as a practice to pull data from SQl
  ```
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db") #establishing a connection with DB
@@ -59,6 +60,8 @@ for csv_file in csv_files:
 db_connection.close()
 
 ```
+### 2.b Data Preporcessing
+
 Lot of cleaning is done in the SQL query instead of dplyr or Pandas. The alternate code is added here in R(dplyr)
 ```
 # ====================Method one splitString ===============================================
@@ -80,11 +83,7 @@ dfBoxScores <- df_box_scores %>%rowwise()%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
 ```
-
-
-
-
-#### 2.a Datasets contents 
+### 2.c Datasets contents 
 Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:
 “<Team 1> v <Team 2> <Date>”
 Please note, that if the game is played at the home of one of the teams (IsNeutralSite=0), then Team 1 will be

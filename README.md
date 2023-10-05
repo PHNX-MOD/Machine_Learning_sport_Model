@@ -2,6 +2,8 @@
 
 The objective is to analyze the disparities between a traditional model and a model that relies on the outcomes influenced by various teams' performance in different quarters of a specific basketball league.
 
+**IN PROGRESS: Exploratory data analysi**
+
 # Table of Contents
 [1.About](#About) <br />
 [2.Exploratory data analysis](#Exploratory-data-analysis)

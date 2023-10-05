@@ -1,7 +1,7 @@
 # **Assessment of Basketball Model with a Focus on Quarter Performance**
 
 The objective is to presesnt the project which operates like a research paper, encompassing all stages of model development, starting from data acquisition and concluding with the presentation of the findings.
-Thw paper deals with analysing the disparities between a traditional model and a model that relies on the outcomes influenced by various teams' performance in different quarters of a specific basketball league.
+The paper deals with analysing the disparities between a traditional model and a model that relies on the outcomes influenced by various teams' performance in different quarters of a specific basketball league.
 
 **IN PROGRESS(currently working): Exploratory data analysis**
 

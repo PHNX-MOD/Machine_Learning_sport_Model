@@ -36,5 +36,3 @@ git clone https://tokenhere@github.com/user_name/repo_name.git
 git add . 
 git commit -m (needs to be a commit message along with this line so I can push through to repo)
 git push
-
-https://saturncloud.io/blog/jupyter-markdown-cheat-sheet-a-quick-guide-for-data-scientists/

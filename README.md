@@ -55,12 +55,13 @@ https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelPyDja
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelRShiny
 
 ## 2.Exploratory data analysis
-The data((mydatabase.db) represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years.
+The data((mydatabase.db) represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years. 
 The objective will be to build a model that is able to predict the winners for the fixtures on the SPECIFC DATE (**/**/****). Details of the dataset contents and goal is discussed in the section [2.c Datasets contents](#Datasets-contents)
 
 ### 2.a Data Preparation
+
 The first step of any machine learning project is to analyse the raw data and use statistical methods to try and understand the meaning and relationships in the dataset. This requires that we check for any missing 
-values and anomalies that would prevent us from using all methods at our disposal. And for this stage of the project only the 'box_scores' dataframe would be the most important as it contains the most relevant
+values and anomalies that would interfere with the either the splitting of the data and model building stage. And for this stage of the project only the 'box_scores' dataframe would be the most important as it contains the most relevant
 and impactful stats that would help acheive the objective of predicting future results. Using libraries such as pandas and numpy in Python to manipulate these dataframes will be most efficient, while libraries such a skimr and tidymodels will be used in R. Writing all the csv data into a database using dbConnect in R, just as a practice to pull data from SQl
  ```
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db") #establishing a connection with DB

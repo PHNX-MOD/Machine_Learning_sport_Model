@@ -40,6 +40,77 @@ Remember that the choice of features, the selection of a machine learning algori
 
 
 
+2. **Create Features**:
+
+
+1. **Shooting Percentages**:
+   - Calculate the Field Goal Percentage (FG%) for each team. FG% is the ratio of successful field goals (2PM + 3PM) to total field goal attempts (2PA + 3PA).
+   - Calculate the Three-Point Percentage (3P%) for each team. 3P% is the ratio of successful three-pointers (3PM) to total three-point attempts (3PA).
+   - Calculate the Free Throw Percentage (FT%) for each team. FT% is the ratio of successful free throws (FTM) to total free throw attempts (FTA).
+
+2. **Rebound Differential**:
+   - Calculate the Offensive Rebound Differential (ORD) for each team. ORD is the difference between the average offensive rebounds (ORB) a team secures and the average offensive rebounds their opponents secure.
+   - Calculate the Defensive Rebound Differential (DRD) for each team. DRD is the difference between the average defensive rebounds (DRB) a team secures and the average defensive rebounds their opponents secure.
+
+3. **Assist-to-Turnover Ratio**:
+   - Calculate the Assist-to-Turnover Ratio (AST/TOV) for each team. This ratio measures a team's ball-handling efficiency. It's the ratio of assists (AST) to turnovers (TOV).
+
+4. **Steal and Block Averages**:
+   - Calculate the average number of steals (STL) and blocks (BLK) for each team. These metrics can represent a team's defensive capabilities.
+
+5. **Foul Differential**:
+   - Calculate the average difference in the number of fouls committed (PF) between a team and its opponents. This can indicate a team's discipline on the court.
+
+6. **Historical Performance**:
+   - Consider incorporating historical performance metrics. For example, calculate the team's win-loss record over a certain number of previous games.
+
+7. **Home Court Advantage**:
+   - If applicable, include a binary feature that indicates whether the game was played at the home court of one of the teams. Home court advantage can significantly impact game outcomes.
+
+8. **Day of the Week**:
+   - Extract the day of the week from the date and include it as a categorical feature. Some teams may perform differently on specific days.
+
+9. **Opponent Strength**:
+   - Consider including a feature that measures the strength of the opponent. This can be based on the opponent's win-loss record, rankings, or other relevant metrics.
+
+10. **Time Since Last Game**:
+    - Calculate the number of days since each team's last game. Fatigue can play a role in performance.
+
+Once you have created these features for each team, you can use them as inputs to your predictive model. Experiment with different combinations of features and machine learning algorithms to determine which set of features and model performs best for your specific prediction task. Additionally, you may need to normalize or scale your features to ensure they have a consistent range before training your model.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

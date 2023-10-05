@@ -63,8 +63,9 @@ db_connection.close()
 
 ```
 ### 2.b Data Preprocessing
-Lot of cleaning is done in the SQL query instead of dplyr or Pandas. The alternate code is added here in R(dplyr)
+Lot of cleaning is done in the SQL query instead of dplyr or Pandas. The alternate code is added here in R/Python
 ```
+=============================R code ========================================================
 # ====================Method one splitString ===============================================
 #df_box_scores is the table from box_scores SELECT * FROM box_scores;
 dfBoxScores <-df_box_scores %>%rowwise()%>%
@@ -76,9 +77,7 @@ dfBoxScores <-df_box_scores %>%rowwise()%>%
   mutate(TeamName = trimws(TeamName))%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
-
 # ====================Method two splitString ============================================
-
 dfBoxScores2 <- df_box_scores %>%rowwise()%>%
   mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%
   mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
@@ -86,7 +85,27 @@ dfBoxScores2 <- df_box_scores %>%rowwise()%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
 
+#============================Python ======================================================
+
+#only missing of NA values in the dataframes is the handicap column in the df_test_fixtures_actuals
+df_box_scores
+df_fixture_info
+df_test_fixtures
+df_test_fixtures_actuals
+df_test_fixtures_actuals.isna()
+df_box_scores.describe()
+df_box_scores_2 = pd.DataFrame()
+df_box_scores_2['HomeTeam'] = df_box_scores['FixtureKey'].apply(lambda x:x.split(" v ")[0])
+df_box_scores_2['AwayTeam'] = df_box_scores['FixtureKey'].apply(lambda x:x.split(" v ")[1])
+df_box_scores_2['AwayTeam'] = df_box_scores_2['AwayTeam'].apply(lambda x:x.replace(x[-11:],""))
+df_box_scores_2['Dates'] = df_box_scores['FixtureKey'].apply(lambda x: x.split(x[:-11])[1])
+df_box_scores_2 = df_box_scores_2.set_index('Dates', drop=True)
+for i in np.arange(2,len(df_box_scores.columns),1):
+    df_box_scores_2[df_box_scores.columns[i]] = df_box_scores[df_box_scores.columns[i]].tolist()
+df_box_scores_2['X2PM'].groupby(df_box_scores_2['HomeTeam']).mean()
+df_box_scores_2['X2PM'].groupby(df_box_scores_2['AwayTeam']).mean()
 ```
+
 ### 2.c Datasets contents 
 Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:
 “<Team 1> v <Team 2> <Date>”

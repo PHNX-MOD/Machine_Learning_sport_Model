@@ -63,7 +63,7 @@ db_connection.close()
 
 ```
 ### 2.b Data Preprocessing
-Lot of cleaning is done in the SQL query instead of dplyr or Pandas. The alternate code is added here in R/Python
+Instead of performing extensive data cleaning within SQL queries, the alternative code presented here in R and Python focuses on data preprocessing. Specifically, it addresses the task of splitting the columns in the df_box_score table, which are initially in the format **TeamA_v_TeamB**' into separate team names. This separation allows for more efficient and structured analysis of each team's aggregate statistics
 ```
 =============================R code ========================================================
 # ====================Method one splitString ===============================================

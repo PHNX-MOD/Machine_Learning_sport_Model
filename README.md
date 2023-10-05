@@ -70,7 +70,9 @@ db_connection.close()
 Instead of performing extensive data cleaning within SQL queries, the alternative code presented here in R and Python focuses on data preprocessing. Specifically, it addresses the task of splitting the columns in the df_box_score table, which are initially in the format **TeamA_v_TeamB**' into separate team names. This separation allows for more efficient and structured analysis of each team's aggregate statistics
 ```
 =============================R code ========================================================
+
 # ====================Method one splitString ===============================================
+
 #df_box_scores is the table from box_scores SELECT * FROM box_scores;
 dfBoxScores <-df_box_scores %>%rowwise()%>%
   mutate(
@@ -81,7 +83,9 @@ dfBoxScores <-df_box_scores %>%rowwise()%>%
   mutate(TeamName = trimws(TeamName))%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
+
 # ====================Method two splitString ============================================
+
 dfBoxScores2 <- df_box_scores %>%rowwise()%>%
   mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%
   mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%

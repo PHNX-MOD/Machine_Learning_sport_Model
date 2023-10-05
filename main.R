@@ -37,22 +37,26 @@ df_test_fixtures <- dbGetQuery(con, "SELECT * FROM test_fixtures")
 df_test_fixtures_actuals <- dbGetQuery(con, "SELECT * FROM test_fixtures_actuals")
 
 
-df_box_score_query <- "
-WITH TeamAvTeamB AS (
+df_box_score_query <- 
+"WITH TeamAvTeamB AS (
     SELECT
         FixtureKey,
         SUBSTR(FixtureKey, 1, LENGTH(FixtureKey) - 12) AS TeamAvTeamB
     FROM
         box_scores
 )
-SELECT
+SELECT DISTINCT
     TeamAvTeamB.FixtureKey AS FixtureKey, 
     TRIM(CASE
             WHEN Team = 1 THEN SUBSTR(TeamAvTeamB, 1, INSTR(TeamAvTeamB, 'v') - 1)
             WHEN Team = 2 THEN SUBSTR(TeamAvTeamB, INSTR(TeamAvTeamB, 'v') + 1)
             ELSE NULL -- Handle other cases if needed
         END) AS TeamName,
-    Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF
+    Team, X2PM, X2PA, X3PM, X3PA, FTM, FTA, ORB, DRB, AST, STL, BLK,TOV,
+    PF,
+    ROUND((CAST(X2PM AS REAL) + CAST(X3PM AS REAL)) / (CAST(X2PA AS REAL) + CAST(X3PA AS REAL))*100,2) AS 'FG%',
+    ROUND((CAST(X2PM AS REAL) / CAST(X3PA AS REAL))*100,2)  AS'3P%',
+    ROUND((CAST(FTM AS REAL) / CAST(FTA AS REAL))*100,2)  AS'FT%'
 FROM
     TeamAvTeamB
     JOIN box_scores ON TeamAvTeamB.FixtureKey = box_scores.FixtureKey;"
@@ -60,16 +64,6 @@ FROM
 
 df_box_scores <- dbGetQuery(df_box_score_query, con)
 
-
-"1. **Shooting Percentages**:
-   - Calculate the Field Goal Percentage (FG%) for each team. FG% is the ratio of successful field goals (2PM + 3PM) to total field goal attempts (2PA + 3PA)."
-
-
-
-
-
-" - Calculate the Three-Point Percentage (3P%) for each team. 3P% is the ratio of successful three-pointers (3PM) to total three-point attempts (3PA).
-   - Calculate the Free Throw Percentage (FT%) for each team. FT% is the ratio of successful free throws (FTM) to total free throw attempts (FTA).
 
 2. **Rebound Differential**:
    - Calculate the Offensive Rebound Differential (ORD) for each team. ORD is the difference between the average offensive rebounds (ORB) a team secures and the average offensive rebounds their opponents secure.

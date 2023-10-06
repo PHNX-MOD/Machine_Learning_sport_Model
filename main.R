@@ -65,36 +65,6 @@ FROM
 df_box_scores <- dbGetQuery(df_box_score_query, con)
 
 
-2. **Rebound Differential**:
-   - Calculate the Offensive Rebound Differential (ORD) for each team. ORD is the difference between the average offensive rebounds (ORB) a team secures and the average offensive rebounds their opponents secure.
-   - Calculate the Defensive Rebound Differential (DRD) for each team. DRD is the difference between the average defensive rebounds (DRB) a team secures and the average defensive rebounds their opponents secure.
-
-3. **Assist-to-Turnover Ratio**:
-   - Calculate the Assist-to-Turnover Ratio (AST/TOV) for each team. This ratio measures a team's ball-handling efficiency. It's the ratio of assists (AST) to turnovers (TOV).
-
-4. **Steal and Block Averages**:
-   - Calculate the average number of steals (STL) and blocks (BLK) for each team. These metrics can represent a team's defensive capabilities.
-
-5. **Foul Differential**:
-   - Calculate the average difference in the number of fouls committed (PF) between a team and its opponents. This can indicate a team's discipline on the court.
-
-6. **Historical Performance**:
-   - Consider incorporating historical performance metrics. For example, calculate the team's win-loss record over a certain number of previous games.
-
-7. **Home Court Advantage**:
-   - If applicable, include a binary feature that indicates whether the game was played at the home court of one of the teams. Home court advantage can significantly impact game outcomes.
-
-8. **Day of the Week**:
-   - Extract the day of the week from the date and include it as a categorical feature. Some teams may perform differently on specific days.
-
-9. **Opponent Strength**:
-   - Consider including a feature that measures the strength of the opponent. This can be based on the opponent's win-loss record, rankings, or other relevant metrics.
-
-10. **Time Since Last Game**:
-    - Calculate the number of days since each team's last game. Fatigue can play a role in performance."
-
-
-
 
 
 dbExecute(con, createTemp2Table)

@@ -6,7 +6,7 @@ WITH TeamAvTeamB AS (
         box_scores AS bs
 )
 
--- Query 1 as a CTE
+-- Query 1 as a CTE, this CTE to for group by and having averages 
 , Query1 AS (
     SELECT DISTINCT
         TRIM(CASE
@@ -27,7 +27,7 @@ WITH TeamAvTeamB AS (
         TeamName
 )
 
--- Query 2 as a CTE
+-- Query 2 as a CTE, this is for the main table to handle operation like addition 
 , Query2 AS (
     SELECT
         bs.FixtureKey,
@@ -57,7 +57,7 @@ WITH TeamAvTeamB AS (
     JOIN box_scores AS bs ON ta.FixtureKey = bs.FixtureKey
 )
 
--- CTE3  Query joining Query1 and Query2 using TeamName
+-- CTE3  Query joining Query1 and Query2 using TeamName, althought this is the final table, need main table to calculate the difference of the avergae joined to the finalcte table, hence it included in a CTE and called outside
 , FinalCTE AS (SELECT DISTINCT
     Query2.FixtureKey, Query2.TeamName,Query2.Oppnent, Query2.HomeTeamAdv, Query2.Team,Query2.X2PM, Query2.X2PA, Query2.X3PM, Query2.X3PA,Query2.FTM, Query2.FTA,
     Query2.ORB,Query2.DRB,Query2.AST,Query2.STL,Query2.BLK,Query2.TOV, Query2.PF,Query2.'FG%', Query2.'3P%',Query2.'FT%',Query2.'ASTtoTOV%',

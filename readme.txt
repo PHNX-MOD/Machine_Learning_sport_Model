@@ -79,39 +79,57 @@ Remember that the choice of features, the selection of a machine learning algori
 Once you have created these features for each team, you can use them as inputs to your predictive model. Experiment with different combinations of features and machine learning algorithms to determine which set of features and model performs best for your specific prediction task. Additionally, you may need to normalize or scale your features to ensure they have a consistent range before training your model.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Work in progress her in the project board --->  https://github.com/users/PHNX-MOD/projects/1/views/1
+
+
+
+
+
+
+
+
+ROUGH WORK
+
+dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
+
+dfBoxScoresDate <- dfBoxScoresFromQuery%>%rowwise()%>%
+  mutate(Date = strsplit(FixtureKey, " ")[[1]]
+                        [length(strsplit(FixtureKey, " ")[[1]])])%>%
+  mutate(Day = weekdays(as.Date(Date, format="%d-%b-%Y")))
+
+
+dfBoxScoresMerged <- merge(dfBoxScoresFromQuery, df_fixture_information,
+                           by.x = 'FixtureKey', by  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,7 +6,7 @@ WITH TeamAvTeamB AS (
         box_scores AS bs
 )
 
--- Query 1 as a CTE, this CTE to for group by and having averages 
+-- Query 1 as a CTE
 , Query1 AS (
     SELECT DISTINCT
         TRIM(CASE
@@ -27,7 +27,7 @@ WITH TeamAvTeamB AS (
         TeamName
 )
 
--- Query 2 as a CTE, this is for the main table to handle operation like addition 
+-- Query 2 as a CTE
 , Query2 AS (
     SELECT
         bs.FixtureKey,
@@ -57,7 +57,7 @@ WITH TeamAvTeamB AS (
     JOIN box_scores AS bs ON ta.FixtureKey = bs.FixtureKey
 )
 
--- CTE3  Query joining Query1 and Query2 using TeamName, althought this is the final table, need main table to calculate the difference of the avergae joined to the finalcte table, hence it included in a CTE and called outside
+-- CTE3  Query joining Query1 and Query2 using TeamName
 , FinalCTE AS (SELECT DISTINCT
     Query2.FixtureKey, Query2.TeamName,Query2.Oppnent, Query2.HomeTeamAdv, Query2.Team,Query2.X2PM, Query2.X2PA, Query2.X3PM, Query2.X3PA,Query2.FTM, Query2.FTA,
     Query2.ORB,Query2.DRB,Query2.AST,Query2.STL,Query2.BLK,Query2.TOV, Query2.PF,Query2.'FG%', Query2.'3P%',Query2.'FT%',Query2.'ASTtoTOV%',
@@ -76,12 +76,24 @@ JOIN Query2 ON Query1.TeamName = Query2.TeamName
 JOIN Query1 AS Query3 ON Query2.Oppnent = Query3.TeamName
 
 )
+
+--Joining Final CTE from BOX score table with fixture_information
+
  SELECT FinalCTE.FixtureKey, FinalCTE.TeamName ,FinalCTE.Oppnent, FinalCTE.'FG%',FinalCTE.'3P%',
  FinalCTE.'FT%', FinalCTE.'ASTtoTOV%',
  (FinalCTE.ORBAvg-FinalCTE.OppORBAvg) AS ORD,
  (FinalCTE.DRBAvg-FinalCTE.OppDRBAvg) AS DRD,
  FinalCTE.STLAvg ,FinalCTE.BLKAvg,
  (FinalCTE.PFAvg-FinalCTE.OppPFAvg) AS DiffPFAvg, 
- FinalCTE.HomeTeamAdv
+ FinalCTE.HomeTeamAdv,
+ fixture_information.TipOff AS TipOff,             
+ fixture_information.GameType AS GameType, 
+ fixture_information.IsNeutralSite AS IsNeutralSite,
+ fixture_information.Attendance AS Attendance,
+ fixture_information.Season AS Season,
+ fixture_information.Team1Conference AS Team1Conference,
+ fixture_information.Team2Conference AS Team2Conference
  FROM
-  FinalCTE
+     FinalCTE
+ JOIN fixture_information ON FinalCTE.FixtureKey = fixture_information.FixtureKey
+"

@@ -98,17 +98,25 @@ dfBoxScoresDate <- dfBoxScoresFromQuery%>%rowwise()%>%
   mutate(Day = weekdays(as.Date(Date, format="%d-%b-%Y")))
 
 
-dfBoxScoresMerged <- merge(dfBoxScoresFromQuery, df_fixture_information,
-                           by.x = 'FixtureKey', by  )
+dfBoxScoresDatetest <- dfBoxScoresDate%>%mutate(
+  CheckHomeAdv = 
+    if(HomeTeamAdv =="Yes" & IsNeutralSite == 0){
+      "Yes"
+    } else if (HomeTeamAdv =="No" & IsNeutralSite == 1) {
+      "No"
+    } else if (HomeTeamAdv =="Yes" & IsNeutralSite == 1) {
+      "No"
+    } else if (HomeTeamAdv =="No" & IsNeutralSite == 0) {
+      "No"
+    }
+)
 
 
 
+print(n=100, dfBoxScoresDatetest%>%filter(HomeTeamAdv =="No" & IsNeutralSite == 0)%>%
+  select(FixtureKey,TeamName, HomeTeamAdv, IsNeutralSite, CheckHomeAdv))
 
-
-
-
-
-
+  
 
 
 

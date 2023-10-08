@@ -15,34 +15,7 @@ The overarching goal is to create a predictive model capable of unveiling the in
 
 The algorithm's reach extends beyond its technical prowess, as it offers seamless access through both Shiny and Django frameworks, providing a user-friendly front-end interface that empowers enthusiasts, analysts, and decision-makers to harness the insights buried within the data.
 
-As an initial step, the project delves into the rich repository of NCAA basketball data, serving as the foundation for an in-depth exploratory data analysis. This analysis not only unravels the intricacies of NCAA basketball but also lays the groundwork for the subsequent stages of model development and refinement.
-
-### 1.a Datasets contents 
-Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:
-“<Team 1> v <Team 2> <Date>”
-Please note, that if the game is played at the home of one of the teams (IsNeutralSite=0), then Team 1 will be
-listed as the home team.
-
-1. box scores.csv
-Box scores are tables that represent the match statistics at a player/team level. This dataset in particular, is displaying the main basketball statistics for each fixture, at the team level. There will be data on:<br />
-• Number of shots made<br/>
-• Number of shots attempted <br />
-• Number of rebounds <br />
-• Number of shots assisted <br />
-• Number of defensive steals forced <br />
-• Number of opponent shots blocked <br />
-• Number of turnovers committed <br />
-• Number of fouls committed <br />
-
-2. fixture information.csv
-Additional information of each of the fixtures that may be useful. The TipOff time is listed in Eastern Time. 
-
-3. test fixtures.csv
-The set of FixtureKeys on the 25th of February, 2023, to predict the fixture outcomes for.
-
-5. test fixtures actuals.csv
-This data shows what actually happened for the fixtures to predict, as well as some additional betting information provided by bookmakers. (Guide on TeamHandicap: -7.0
-would mean that the team was predicted to win by 7 points, and +3.5 would mean that the team was predicted to lose by 3.5 points.)
+As an initial step, the project delves into the rich repository of NCAA basketball data ( please refer [2.c Datasets contents](#Datasets-contents) ), serving as the foundation for an in-depth exploratory data analysis. This analysis not only unravels the intricacies of NCAA basketball but also lays the groundwork for the subsequent stages of model development and refinement. 
 
 #### working files
 
@@ -142,5 +115,31 @@ for i in np.arange(2,len(df_box_scores.columns),1):
 df_box_scores_2['X2PM'].groupby(df_box_scores_2['HomeTeam']).mean()
 df_box_scores_2['X2PM'].groupby(df_box_scores_2['AwayTeam']).mean()
 ```
+### 2.c Datasets contents 
+Each of the fixtures are represented uniquely by a FixtureKey. This is in a format:
+“<Team 1> v <Team 2> <Date>”
+Please note, that if the game is played at the home of one of the teams (IsNeutralSite=0), then Team 1 will be
+listed as the home team.
+
+1. box scores.csv
+Box scores are tables that represent the match statistics at a player/team level. This dataset in particular, is displaying the main basketball statistics for each fixture, at the team level. There will be data on:<br />
+• Number of shots made<br/>
+• Number of shots attempted <br />
+• Number of rebounds <br />
+• Number of shots assisted <br />
+• Number of defensive steals forced <br />
+• Number of opponent shots blocked <br />
+• Number of turnovers committed <br />
+• Number of fouls committed <br />
+
+2. fixture information.csv
+Additional information of each of the fixtures that may be useful. The TipOff time is listed in Eastern Time. 
+
+3. test fixtures.csv
+The set of FixtureKeys on the 25th of February, 2023, to predict the fixture outcomes for.
+
+5. test fixtures actuals.csv
+This data shows what actually happened for the fixtures to predict, as well as some additional betting information provided by bookmakers. (Guide on TeamHandicap: -7.0
+would mean that the team was predicted to win by 7 points, and +3.5 would mean that the team was predicted to lose by 3.5 points.)
 
 more details regarding the project are in readme.text file-->  https://github.com/PHNX-MOD/Regression_SB/blob/main/readme.txt

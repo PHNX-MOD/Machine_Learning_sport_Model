@@ -8,7 +8,6 @@ starwars
 skim(starwars)
 view(starwars)
 
-datareg <- starwars%>%select(height, mass, gender)
 
 # we need to sample our data i,e split into test and train, so we use R sample
 
@@ -36,8 +35,56 @@ df_fixture_information <- dbGetQuery(con, "SELECT * FROM fixture_information")
 df_test_fixtures <- dbGetQuery(con, "SELECT * FROM test_fixtures")
 df_test_fixtures_actuals <- dbGetQuery(con, "SELECT * FROM test_fixtures_actuals")
 
+skim(df_box_scores)
+skim(df_fixture_information)
+skim(df_test_fixtures)
+skim(df_test_fixtures_actuals)
 
-df_box_score_query <- 
+FixtureKey <- "LIPSCO v A PEAY 14-Jan-2023"
+
+splitfun = unlist(strsplit(df_box_scores$FixtureKey[1], " "))
+team_names <- paste(unlist(strsplit(df_box_scores$FixtureKey[1], " "))[1:4], collapse = " ")
+date <- unlist(strsplit(df_box_scores$FixtureKey[1], " "))[5]
+
+
+# ====================Method one splitString ===============================================
+
+dfBoxScores <-df_box_scores %>%rowwise()%>%
+  mutate(
+    SplittedString = strsplit(FixtureKey, " "),
+    TeamAvTeamB = paste(unlist(SplittedString[-length(SplittedString)]), collapse = " ")
+  )%>%
+  mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
+  mutate(TeamName = trimws(TeamName))%>%
+  select(!TeamAvTeamB)%>%
+  select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
+
+dfBoxScores<- dfBoxScores%>%group_by(TeamName)%>%
+  summarise(X2PA = mean(X2PA))
+
+
+# ====================Methods two splitString ============================================
+
+
+
+dfBoxScores2 <- df_box_scores %>%rowwise()%>%
+  mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%
+  mutate(TeamName = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][Team])%>%
+  mutate(TeamName = trimws(TeamName))%>%
+  select(!TeamAvTeamB)%>%
+  select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
+
+
+
+con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
+
+
+dbExecute(con, createTemp2Table)
+dbGetQuery(con, qurt1)
+
+#==========================================================query======================
+
+qurt1 <- 
 "WITH TeamAvTeamB AS (
     SELECT
         bs.FixtureKey,
@@ -116,38 +163,112 @@ JOIN Query2 ON Query1.TeamName = Query2.TeamName
 JOIN Query1 AS Query3 ON Query2.Oppnent = Query3.TeamName
 
 )
+
+--Joining Final CTE from BOX score table with fixture_information
+
  SELECT FinalCTE.FixtureKey, FinalCTE.TeamName ,FinalCTE.Oppnent, FinalCTE.'FG%',FinalCTE.'3P%',
  FinalCTE.'FT%', FinalCTE.'ASTtoTOV%',
  (FinalCTE.ORBAvg-FinalCTE.OppORBAvg) AS ORD,
  (FinalCTE.DRBAvg-FinalCTE.OppDRBAvg) AS DRD,
  FinalCTE.STLAvg ,FinalCTE.BLKAvg,
  (FinalCTE.PFAvg-FinalCTE.OppPFAvg) AS DiffPFAvg, 
- FinalCTE.HomeTeamAdv
+ FinalCTE.HomeTeamAdv,
+ fixture_information.TipOff AS TipOff,             
+ fixture_information.GameType AS GameType, 
+ fixture_information.IsNeutralSite AS IsNeutralSite,
+ fixture_information.Attendance AS Attendance,
+ fixture_information.Season AS Season,
+ fixture_information.Team1Conference AS Team1Conference,
+ fixture_information.Team2Conference AS Team2Conference
  FROM
-  FinalCTE;"
+     FinalCTE
+ JOIN fixture_information ON FinalCTE.FixtureKey = fixture_information.FixtureKey
+"
+#==========================================================queryEND======================
+
+dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
+
+dfBoxScoresDate <- dfBoxScoresFromQuery%>%rowwise()%>%
+  mutate(Date = strsplit(FixtureKey, " ")[[1]]
+                        [length(strsplit(FixtureKey, " ")[[1]])])%>%
+  mutate(Day = weekdays(as.Date(Date, format="%d-%b-%Y")))%>%
+  mutate(
+    HomeTeamAdv = 
+      if(HomeTeamAdv =="Yes" & IsNeutralSite == 0){
+        "Yes"
+      } else if (HomeTeamAdv =="No" & IsNeutralSite == 1) {
+        "No"
+      } else if (HomeTeamAdv =="Yes" & IsNeutralSite == 1) {
+        "No"
+      } else if (HomeTeamAdv =="No" & IsNeutralSite == 0) {
+        "No"
+      }
+  )%>%
+  #adding home advantage factor
+  mutate(HomeTeamAdv = ifelse(HomeTeamAdv == "Yes", 1, 0) * 0.05)%>%
+  #calculating base score
+  mutate(Base_score = ((`FG%`*0.3) + (`3P%`*0.2)+(`FT%`*0.1)+(`ASTtoTOV%`*0.2)+
+           (ORD*0.05)+(DRD*0.05)+(STLAvg*0.03)+(BLKAvg*0.02)+(DiffPFAvg*0.03)+HomeTeamAdv))%>%
+  #adding attendance factor
+  mutate(Base_score = Base_score*ifelse(Attendance == 0, 1, 1+0.05*(Attendance/max(Attendance))))%>%
+  #adding home GameType factor
+  mutate(Base_score = case_when(
+    GameType == "RegularSeason" ~ 1.0*Base_score,
+    GameType == "ConferenceChampionship" ~ 1.1*Base_score,
+    GameType == "NIT" ~ 1.2*Base_score,
+    TRUE ~ 1.0*Base_score))%>%
+  select(FixtureKey, TeamName,Oppnent,TipOff, Day,Base_score)
 
 
-df_box_scores <- dbGetQuery(df_box_score_query, con)
+dfBoxScoresFromQueryHome <- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "Yes")
+dfBoxScoresFromQueryAway <- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "No")
 
+# ==========================================================time_multipliers=====================================================================
 
+def calculate_performance_score(row, max_attendance=69423):
+  base_score =
+  
+  # Tip-off time adjustment
+  time_multipliers = {
+    "Early": 0.98,
+    "Afternoon": 1.0,
+    "Evening": 1.02,
+    "Night": 1.01
+  }
+time_multiplier = time_multipliers.get(categorize_time(row['TipOff']), 1.0)
 
+# Day of the week adjustment
+day_multipliers = {
+  "Monday": 1.0,
+  "Tuesday": 1.0,
+  "Wednesday": 1.0,
+  "Thursday": 1.0,
+  "Friday": 1.01,
+  "Saturday": 1.02,
+  "Sunday": 1.01
+}
+day_multiplier = day_multipliers.get(row['Day'], 1.0)
 
-dbExecute(con, createTemp2Table)
-dbGetQuery(con, joinTemp1Temp2)
+return base_score * game_multiplier * attendance_factor * time_multiplier * day_multiplier
 
+def categorize_time(tip_off_time):
+  hour = int(tip_off_time.split(":")[0])
+if 6 <= hour < 12:
+  return "Early"
+elif 12 <= hour < 17:
+  return "Afternoon"
+elif 17 <= hour < 21:
+  return "Evening"
+else:
+  return "Night"
 
+# =====================================day_multipliers.get==============================================
 
+result = predict_winner(df.iloc[0], df.iloc[1])
+print(result)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+Feature Engineering:
+  
+Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
+Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
+This can include an updated average performance score, total wins, total losses, etc.

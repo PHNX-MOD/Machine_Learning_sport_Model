@@ -127,11 +127,6 @@ dfBoxScoresDate <- dfBoxScoresFromQuery%>%rowwise()%>%
 
 dfBoxScoresFromQueryHome <- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "Yes")
 dfBoxScoresFromQueryAway <- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "No")
-  
-
-
-
-
 
 
 def predict_winner(teamA, teamB):
@@ -139,7 +134,6 @@ def predict_winner(teamA, teamB):
 scoreB = calculate_performance_score(teamB)
 return "TeamA" if scoreA > scoreB else "TeamB"
 
-# Example: Assuming df is your dataframe and row 0 and 1 represent two teams in a match
 result = predict_winner(df.iloc[0], df.iloc[1])
 print(result)
 

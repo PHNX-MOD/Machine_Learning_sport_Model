@@ -95,29 +95,59 @@ dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
 dfBoxScoresDate <- dfBoxScoresFromQuery%>%rowwise()%>%
   mutate(Date = strsplit(FixtureKey, " ")[[1]]
                         [length(strsplit(FixtureKey, " ")[[1]])])%>%
-  mutate(Day = weekdays(as.Date(Date, format="%d-%b-%Y")))
+  mutate(Day = weekdays(as.Date(Date, format="%d-%b-%Y")))%>%
+  mutate(
+    HomeTeamAdv = 
+      if(HomeTeamAdv =="Yes" & IsNeutralSite == 0){
+        "Yes"
+      } else if (HomeTeamAdv =="No" & IsNeutralSite == 1) {
+        "No"
+      } else if (HomeTeamAdv =="Yes" & IsNeutralSite == 1) {
+        "No"
+      } else if (HomeTeamAdv =="No" & IsNeutralSite == 0) {
+        "No"
+      }
+  )%>%
+  #adding home advantage factor
+  mutate(HomeTeamAdv = ifelse(HomeTeamAdv == "Yes", 1, 0) * 0.05)%>%
+  #calculating base score
+  mutate(Base_score = ((`FG%`*0.3) + (`3P%`*0.2)+(`FT%`*0.1)+(`ASTtoTOV%`*0.2)+
+           (ORD*0.05)+(DRD*0.05)+(STLAvg*0.03)+(BLKAvg*0.02)+(DiffPFAvg*0.03)+HomeTeamAdv))%>%
+  #adding attendance factor
+  mutate(Base_score = Base_score*ifelse(Attendance == 0, 1, 1+0.05*(Attendance/max(Attendance))))%>%
+  #adding home GameType factor
+  mutate(Base_score = case_when(
+    GameType == "RegularSeason" ~ 1.0*Base_score,
+    GameType == "ConferenceChampionship" ~ 1.1*Base_score,
+    GameType == "NIT" ~ 1.2*Base_score,
+    TRUE ~ 1.0*Base_score))%>%
+  select(FixtureKey, TeamName,Oppnent,TipOff, Day,Base_score)
 
 
-dfBoxScoresDatetest <- dfBoxScoresDate%>%mutate(
-  CheckHomeAdv = 
-    if(HomeTeamAdv =="Yes" & IsNeutralSite == 0){
-      "Yes"
-    } else if (HomeTeamAdv =="No" & IsNeutralSite == 1) {
-      "No"
-    } else if (HomeTeamAdv =="Yes" & IsNeutralSite == 1) {
-      "No"
-    } else if (HomeTeamAdv =="No" & IsNeutralSite == 0) {
-      "No"
-    }
-)
 
-
-
-print(n=100, dfBoxScoresDatetest%>%filter(HomeTeamAdv =="No" & IsNeutralSite == 0)%>%
-  select(FixtureKey,TeamName, HomeTeamAdv, IsNeutralSite, CheckHomeAdv))
-
+dfBoxScoresFromQueryHome <- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "Yes")
+dfBoxScoresFromQueryAway <- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "No")
   
 
+
+
+
+
+
+def predict_winner(teamA, teamB):
+  scoreA = calculate_performance_score(teamA)
+scoreB = calculate_performance_score(teamB)
+return "TeamA" if scoreA > scoreB else "TeamB"
+
+# Example: Assuming df is your dataframe and row 0 and 1 represent two teams in a match
+result = predict_winner(df.iloc[0], df.iloc[1])
+print(result)
+
+Feature Engineering:
+  
+Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
+Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
+This can include an updated average performance score, total wins, total losses, etc.
 
 
 

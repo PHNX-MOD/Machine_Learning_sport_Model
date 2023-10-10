@@ -188,87 +188,91 @@ JOIN Query1 AS Query3 ON Query2.Oppnent = Query3.TeamName
 
 dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
 
-dfBoxScoresDate <- dfBoxScoresFromQuery%>%rowwise()%>%
-  mutate(Date = strsplit(FixtureKey, " ")[[1]]
-                        [length(strsplit(FixtureKey, " ")[[1]])])%>%
-  mutate(Day = weekdays(as.Date(Date, format="%d-%b-%Y")))%>%
-  mutate(
-    HomeTeamAdv = 
-      if(HomeTeamAdv =="Yes" & IsNeutralSite == 0){
-        "Yes"
-      } else if (HomeTeamAdv =="No" & IsNeutralSite == 1) {
-        "No"
-      } else if (HomeTeamAdv =="Yes" & IsNeutralSite == 1) {
-        "No"
-      } else if (HomeTeamAdv =="No" & IsNeutralSite == 0) {
-        "No"
-      }
-  )%>%
-  #adding home advantage factor
-  mutate(HomeTeamAdv = ifelse(HomeTeamAdv == "Yes", 1, 0) * 0.05)%>%
-  #calculating base score
-  mutate(Base_score = ((`FG%`*0.3) + (`3P%`*0.2)+(`FT%`*0.1)+(`ASTtoTOV%`*0.2)+
-           (ORD*0.05)+(DRD*0.05)+(STLAvg*0.03)+(BLKAvg*0.02)+(DiffPFAvg*0.03)+HomeTeamAdv))%>%
-  #adding attendance factor
-  mutate(Base_score = Base_score*ifelse(Attendance == 0, 1, 1+0.05*(Attendance/max(Attendance))))%>%
-  #adding home GameType factor
-  mutate(Base_score = case_when(
-    GameType == "RegularSeason" ~ 1.0*Base_score,
-    GameType == "ConferenceChampionship" ~ 1.1*Base_score,
-    GameType == "NIT" ~ 1.2*Base_score,
-    TRUE ~ 1.0*Base_score))%>%
-  select(FixtureKey, TeamName,Oppnent,TipOff, Day,Base_score)
-
-
-dfBoxScoresFromQueryHome <- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "Yes")
-dfBoxScoresFromQueryAway <- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "No")
-
-# ==========================================================time_multipliers=====================================================================
-
-def calculate_performance_score(row, max_attendance=69423):
-  base_score =
-  
-  # Tip-off time adjustment
-  time_multipliers = {
-    "Early": 0.98,
-    "Afternoon": 1.0,
-    "Evening": 1.02,
-    "Night": 1.01
-  }
-time_multiplier = time_multipliers.get(categorize_time(row['TipOff']), 1.0)
-
-# Day of the week adjustment
-day_multipliers = {
-  "Monday": 1.0,
-  "Tuesday": 1.0,
-  "Wednesday": 1.0,
-  "Thursday": 1.0,
-  "Friday": 1.01,
-  "Saturday": 1.02,
-  "Sunday": 1.01
+fiter_box_scoreFun <- function(df){
+  df%>%rowwise()%>%
+    mutate(Date = strsplit(FixtureKey, " ")[[1]]
+           [length(strsplit(FixtureKey, " ")[[1]])])%>%
+    mutate(Day = weekdays(as.Date(Date, format="%d-%b-%Y")))%>%
+    mutate(
+      HomeTeamAdv = 
+        if(HomeTeamAdv =="Yes" & IsNeutralSite == 0){
+          "Yes"
+        } else if (HomeTeamAdv =="No" & IsNeutralSite == 1) {
+          "No"
+        } else if (HomeTeamAdv =="Yes" & IsNeutralSite == 1) {
+          "No"
+        } else if (HomeTeamAdv =="No" & IsNeutralSite == 0) {
+          "No"
+        }
+    )%>%
+    #adding home advantage factor
+    mutate(HomeTeamAdv = ifelse(HomeTeamAdv == "Yes", 1, 0) * 0.05)%>%
+    #calculating base score
+    mutate(Base_score = ((`FG%`*0.3) + (`3P%`*0.2)+(`FT%`*0.1)+(`ASTtoTOV%`*0.2)+
+                           (ORD*0.05)+(DRD*0.05)+(STLAvg*0.03)+(BLKAvg*0.02)+(DiffPFAvg*0.03)+HomeTeamAdv))%>%
+    #adding attendance factor
+    mutate(Base_score = Base_score*ifelse(Attendance == 0, 1, 1+0.05*(Attendance/max(Attendance))))%>%
+    #adding home GameType factor
+    mutate(Base_score = case_when(
+      GameType == "RegularSeason" ~ 1.0*Base_score,
+      GameType == "ConferenceChampionship" ~ 1.1*Base_score,
+      GameType == "NIT" ~ 1.2*Base_score,
+      TRUE ~ 1.0*Base_score))%>%
+    mutate(time_multiplier = as.integer(strsplit(TipOff[1],":")[[1]][1]))%>%
+    mutate(Base_score = case_when(
+      time_multiplier >= 6 & time_multiplier < 12 ~ 0.98*Base_score,
+      time_multiplier >= 12 & time_multiplier < 17 ~ 1*Base_score,
+      time_multiplier >= 17 & time_multiplier < 21 ~ 1.02*Base_score,
+      TRUE ~ 1.01*Base_score
+    ))%>%mutate(Base_score = case_when(
+      Day == "Monday"~ 1.0*Base_score,
+      Day == "Tuesday"~ 1.0*Base_score,
+      Day == "Wednesday"~ 1.0*Base_score,
+      Day == "Thursday"~ 1.0*Base_score,
+      Day == "Friday"~ 1.01*Base_score,
+      Day == "Saturday"~ 1.02*Base_score,
+      Day == "Sunday"~ 1.01*Base_score
+    ))%>%select(FixtureKey, TeamName,Oppnent,Base_score)
 }
-day_multiplier = day_multipliers.get(row['Day'], 1.0)
 
-return base_score * game_multiplier * attendance_factor * time_multiplier * day_multiplier
+dfBoxScores <- fiter_box_scoreFun(dfBoxScoresFromQuery)
 
-def categorize_time(tip_off_time):
-  hour = int(tip_off_time.split(":")[0])
-if 6 <= hour < 12:
-  return "Early"
-elif 12 <= hour < 17:
-  return "Afternoon"
-elif 17 <= hour < 21:
-  return "Evening"
-else:
-  return "Night"
+dfBoxScoresHome<- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "Yes")
+dfBoxScoresHome <- fiter_box_scoreFun(dfBoxScoresHome)
 
-# =====================================day_multipliers.get==============================================
+dfBoxScoresAway<- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "No")
+dfBoxScoresAway <- fiter_box_scoreFun(dfBoxScoresAway)
 
-result = predict_winner(df.iloc[0], df.iloc[1])
-print(result)
+
+Final_Score <- merge(dfBoxScoresHome%>%rename(Home = TeamName, Away=Oppnent, Home_score = Base_score),
+                     dfBoxScoresAway%>%rename(Away = TeamName, Home=Oppnent, Away_score = Base_score))%>%
+  mutate(Home_score = round(Home_score,2),
+         Away_score = round(Away_score,2))
+  
+
+
 
 Feature Engineering:
   
 Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
 Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
 This can include an updated average performance score, total wins, total losses, etc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

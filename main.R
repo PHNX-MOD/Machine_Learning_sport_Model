@@ -250,6 +250,12 @@ Final_Score <- merge(dfBoxScoresHome%>%rename(Home = TeamName, Away=Oppnent, Hom
          Away_score = round(Away_score,2))
   
 
+dfboxscoresMean <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBoxScoresAway%>%select(-Oppnent, -FixtureKey ))%>%
+  group_by(TeamName)%>%summarise(Base_score = mean(Base_score))
+
+dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBoxScoresAway%>%select(-Oppnent, -FixtureKey ))%>%
+  group_by(TeamName)%>%summarise(Base_score = median(Base_score))
+
 
 
 Feature Engineering:
@@ -257,22 +263,5 @@ Feature Engineering:
 Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
 Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
 This can include an updated average performance score, total wins, total losses, etc.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

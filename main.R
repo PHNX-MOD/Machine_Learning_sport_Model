@@ -188,6 +188,9 @@ JOIN Query1 AS Query3 ON Query2.Oppnent = Query3.TeamName
 
 dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
 
+
+
+
 fiter_box_scoreFun <- function(df){
   df%>%rowwise()%>%
     mutate(Date = strsplit(FixtureKey, " ")[[1]]
@@ -258,10 +261,58 @@ dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBox
 
 
 
+
+data <- Final_Score %>%
+  mutate(Winner = if_else(Home_score > Away_score, 1, 0))
+
+# One-hot encoding for teams
+# One-hot encoding for 'Home' teams
+home_encoded <- model.matrix(~ Home - 1, data=data)
+
+# One-hot encoding for 'Away' teams
+away_encoded <- model.matrix(~ Away - 1, data=data)
+
+# Combining the encoded matrices with the original dataset
+data_encoded <- as.data.frame(cbind(data, home_encoded, away_encoded))
+
+model <- glm(Winner ~ . - FixtureKey - Home - Away - Home_score - Away_score, 
+             data=data_encoded, family=binomial(link="logit"))
+
+summary(model)
+
+predicted_probs <- predict(model, newdata=data, type="response")
+
+predicted_classes <- ifelse(predicted_probs > 0.5, 1, 0)
+  
+  
+  
+  
+  
+  
+  
+  
+  
 Feature Engineering:
   
 Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
 Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
 This can include an updated average performance score, total wins, total losses, etc.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

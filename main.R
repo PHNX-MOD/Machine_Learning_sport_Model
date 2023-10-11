@@ -2,6 +2,7 @@ library(tidymodels)
 library(skimr)
 library(rsample)
 library(purrr)
+library(recipes)
 
 starwars
 
@@ -261,11 +262,15 @@ dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBox
 
 
 
+#==============feature ====================================================================
+
+
 
 data <- Final_Score %>%
   mutate(Winner = if_else(Home_score > Away_score, 1, 0))
 
-# One-hot encoding for teams
+
+
 # One-hot encoding for 'Home' teams
 home_encoded <- model.matrix(~ Home - 1, data=data)
 
@@ -274,6 +279,16 @@ away_encoded <- model.matrix(~ Away - 1, data=data)
 
 # Combining the encoded matrices with the original dataset
 data_encoded <- as.data.frame(cbind(data, home_encoded, away_encoded))
+
+
+
+normalize <- function(feature){(feature-mean(feature))/sd(feature)}
+
+home_encoded %>% mutate_all(normalize)
+
+
+
+
 
 model <- glm(Winner ~ . - FixtureKey - Home - Away - Home_score - Away_score, 
              data=data_encoded, family=binomial(link="logit"))
@@ -286,7 +301,7 @@ predicted_classes <- ifelse(predicted_probs > 0.5, 1, 0)
   
   
   
-  
+#==============feature ==================================eng================ 
   
   
   

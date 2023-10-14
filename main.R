@@ -270,27 +270,34 @@ dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBox
 data <- Final_Score %>%select(!FixtureKey)%>%
   mutate(Winner = if_else(Home_score > Away_score, 1, 0))
 
+dataSplit <- initial_split(data)
+dataTrain <- training(dataSplit)
+dataTest <- testing(dataSplit)
 
-data
 
+#========================hot coding using  carret library ==========
 
 dummies_model <- dummyVars(Winner ~ ., data=data)
 data_transformed <- predict(dummies_model, newdata = data)
 data_encoded <- as.data.frame(data_transformed)
-
-
-juice(data%>%recipe()%>%
-  step_dummy(Winner)%>%
-  step_normalize()%>%prep())
-  
-  
-
-
 normalize <- function(feature){(feature-mean(feature))/sd(feature)}
+#========================hot coding using  carret library ==========
 
 
+data_recipe <- train_data_normalized %>% 
+  recipe() %>%
+  step_dummy(Home, Away) %>%
+  step_normalize(all_numeric(), -Winner) %>%
+  prep()
+  
+data_normalized <- juice(data_recipe)
 
 
+#=======================log regression==========================
+
+model <- glm(Winner ~ ., data=data_normalized, family=binomial())
+
+predictions <- predict(model, newdata=dataTest, type="response")
 
 
 model <- glm(Winner ~ . - FixtureKey - Home - Away - Home_score - Away_score, 
@@ -302,35 +309,12 @@ predicted_probs <- predict(model, newdata=data, type="response")
 
 predicted_classes <- ifelse(predicted_probs > 0.5, 1, 0)
   
-  
-  
-#==============feature ==================================eng================ 
-  
-  
-  
-  
+
+#==============feature ==================================eng================  
   
 Feature Engineering:
   
 Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
 Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
 This can include an updated average performance score, total wins, total losses, etc.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

@@ -3,6 +3,7 @@ library(skimr)
 library(rsample)
 library(purrr)
 library(recipes)
+library(caret)
 
 starwars
 
@@ -266,25 +267,27 @@ dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBox
 
 
 
-data <- Final_Score %>%
+data <- Final_Score %>%select(!FixtureKey)%>%
   mutate(Winner = if_else(Home_score > Away_score, 1, 0))
 
 
+data
 
-# One-hot encoding for 'Home' teams
-home_encoded <- model.matrix(~ Home - 1, data=data)
 
-# One-hot encoding for 'Away' teams
-away_encoded <- model.matrix(~ Away - 1, data=data)
+dummies_model <- dummyVars(Winner ~ ., data=data)
+data_transformed <- predict(dummies_model, newdata = data)
+data_encoded <- as.data.frame(data_transformed)
 
-# Combining the encoded matrices with the original dataset
-data_encoded <- as.data.frame(cbind(data, home_encoded, away_encoded))
 
+juice(data%>%recipe()%>%
+  step_dummy(Winner)%>%
+  step_normalize()%>%prep())
+  
+  
 
 
 normalize <- function(feature){(feature-mean(feature))/sd(feature)}
 
-home_encoded %>% mutate_all(normalize)
 
 
 

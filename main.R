@@ -304,9 +304,17 @@ confusionMatrix(as.factor(predicted_classes), as.factor(dataTest$Winner))
   
 
 #==============Score prediction model ============================================
+
+Final_ScoreAvgScores <-  merge(Final_Score, dfboxscoresMean, by.x = "Home", by.y = "TeamName", all.x = TRUE)%>%rename(HomeScoreAvg = Base_score)%>%select(-FixtureKey)
+Final_ScoreAvgScores <- merge(Final_ScoreAvgScores, dfboxscoresMean, by.x = "Away", by.y = "TeamName", all.x = TRUE)%>%rename(AwayScoreAvg = Base_score)
+
+Final_ScoreAvgScores <- Final_ScoreAvgScores%>%select(Home, Away, HomeScoreAvg, AwayScoreAvg, Home_score, Away_score)
+head(Final_ScoreAvgScores,10)
+
+
+
+
   
-
-
   
   
 # Feature Engineering:
@@ -315,21 +323,5 @@ confusionMatrix(as.factor(predicted_classes), as.factor(dataTest$Winner))
 # Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
 # This can include an updated average performance score, total wins, total losses, etc.
 # 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

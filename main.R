@@ -263,28 +263,22 @@ dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBox
 
 
 
-#==============feature ====================================================================
-
-
+#==============Prediction model ====================================================================
 
 data <- Final_Score %>%select(!FixtureKey)%>%
   mutate(Winner = if_else(Home_score > Away_score, 1, 0))
 
-dataSplit <- initial_split(data)
-dataTrain <- training(dataSplit)
-dataTest <- testing(dataSplit)
-
-
-#========================hot coding using  carret library ==========
+#hot coding using  carret library
 
 dummies_model <- dummyVars(Winner ~ ., data=data)
 data_transformed <- predict(dummies_model, newdata = data)
 data_encoded <- as.data.frame(data_transformed)
 normalize <- function(feature){(feature-mean(feature))/sd(feature)}
-#========================hot coding using  carret library ==========
 
 
-data_recipe <- train_data_normalized %>% 
+#hot coding using recipe library
+
+data_recipe <- data %>% 
   recipe() %>%
   step_dummy(Home, Away) %>%
   step_normalize(all_numeric(), -Winner) %>%
@@ -292,29 +286,50 @@ data_recipe <- train_data_normalized %>%
   
 data_normalized <- juice(data_recipe)
 
+dataSplit <- initial_split(data_normalized)
+dataTrain <- training(dataSplit)
+dataTest <- testing(dataSplit)
 
-#=======================log regression==========================
 
-model <- glm(Winner ~ ., data=data_normalized, family=binomial())
+#Regression prediction model
+
+model <- glm(Winner ~ ., data=dataTrain, family=binomial())
 
 predictions <- predict(model, newdata=dataTest, type="response")
+predicted_classes <- ifelse(predictions > 0.5, 1, 0)
+confusionMatrix(as.factor(predicted_classes), as.factor(dataTest$Winner))
 
 
-model <- glm(Winner ~ . - FixtureKey - Home - Away - Home_score - Away_score, 
-             data=data_encoded, family=binomial(link="logit"))
-
-summary(model)
-
-predicted_probs <- predict(model, newdata=data, type="response")
-
-predicted_classes <- ifelse(predicted_probs > 0.5, 1, 0)
+#==============Prediction model ==================================end================ 
   
 
-#==============feature ==================================eng================  
+#==============Score prediction model ============================================
   
-Feature Engineering:
+
+
   
-Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
-Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
-This can include an updated average performance score, total wins, total losses, etc.
+  
+# Feature Engineering:
+#   
+# Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
+# Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
+# This can include an updated average performance score, total wins, total losses, etc.
+# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

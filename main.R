@@ -8,6 +8,33 @@ library(ggplot2)
 library(pROC)
 library(RSQLite)
 
+# to add R-Markdown file into the repo
+---
+title: "NCAARegressionModel"
+author: "Modith Hadya, Sean Mulvihill"
+date: "2023-10-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, include=FALSE}
+library(tidymodels)
+library(skimr)
+library(rsample)
+library(purrr)
+library(recipes)
+library(caret)
+library(ggplot2)
+library(pROC)
+library(RSQLite)
+
+```
+
+
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db") #connect to databse 
 

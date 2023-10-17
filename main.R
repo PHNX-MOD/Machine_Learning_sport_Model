@@ -5,6 +5,7 @@ library(purrr)
 library(recipes)
 library(caret)
 library(ggplot2)
+library(pROC)
 
 
 starwars
@@ -297,9 +298,41 @@ dataTest <- testing(dataSplit)
 
 winner_prediction_model <- glm(Winner ~ ., data=dataTrain, family=binomial())
 
+
+#check for the NA values / residuals tune the model 
+
 winner_predictions <- predict(winner_prediction_model, newdata=dataTest, type="response")
-winner_predicted_classes <- ifelse(predictions > 0.5, 1, 0)
-confusionMatrix(as.factor(winner_predicted_classes), as.factor(dataTest$Winner))
+
+threshold <- 0.5
+predicted_classes <- ifelse(winner_predictions > threshold, 1, 0)
+
+confusionMatrix(as.factor(predicted_classes), as.factor(dataTest$Winner))
+
+
+predicted_classes <- ifelse(predicted_probabilities > threshold, 1, 0)
+
+#plot & evaluate the model
+
+observed_values <- dataTest$Winner
+
+winner_predictions <- winner_predictions[!is.na(winner_predictions)]
+observed_values <- observed_values[!is.na(observed_values)]
+
+rmse_winner <- sqrt(mean((winner_predictions - observed_values)^2))
+
+#plot 
+roc_obj <- roc(observed_values, winner_predictions)
+
+ggplot(data = data.frame(
+  FPR = roc_obj$specificities,
+  TPR = roc_obj$sensitivities
+)) +
+  geom_line(aes(x = FPR, y = TPR), color="blue") +
+  geom_abline(intercept = 0, slope = 1, color="gray") +
+  ggtitle("ROC Curve") +
+  labs(x="False Positive Rate (1-Specificity)", y="True Positive Rate (Sensitivity)") +
+  annotate("text", x = 0.3, y = 0.2, label = paste("AUC =", round(auc(roc_obj), 2)))
+
 
 
 #==============Prediction model ==================================end================ 
@@ -331,24 +364,19 @@ predicted_home_scores_test <- predict(model_home, newdata=dataTestHome)
 
 
 
-@@@@@check for the NA values in the test data #comment
-RMSE_home <- sqrt(mean((predicted_home_scores_test - dataTestHome$Home_score)^2))
+#plotting the graph / Evaluate the models 
+comparison_data_home <- data.frame(Actual = dataTestHome$Home_score, Predicted = predicted_home_scores_test)
 
-
-
-
-
-
-#plotting the graph 
-comparison_data <- data.frame(Actual = dataTestHome$Home_score, Predicted = predicted_home_scores_test)
-
-ggplot(comparison_data, aes(x = Actual, y = Predicted)) + 
+ggplot(comparison_data_home, aes(x = Actual, y = Predicted)) + 
   geom_point() + 
   geom_smooth(method = "lm", se = FALSE, color = "red") + 
   ggtitle("Actual vs Predicted Home Scores") + 
   xlab("Actual Home Scores") + 
   ylab("Predicted Home Scores")
 
+residuals_home <- comparison_data$Actual - comparison_data$Predicted
+valid_residuals_home <- residuals_home[!is.na(residuals_home)]
+rmse_home <- sqrt(mean(valid_residuals^2))
 
 
 
@@ -368,26 +396,27 @@ dataTestAway <- testing(dataSplitAway)
 
 model_away <- lm(Away_score ~ ., data=dataTrainAway)
 
-library(ggplot2)
+predicted_away_scores_test <- predict(model_away, newdata =dataTestAway )
 
-comparison_data <- data.frame(Actual = dataTestHome$Home_score, Predicted = predicted_home_scores_test)
-ggplot(comparison_data, aes(x = Actual, y = Predicted)) + 
-  geom_point() + 
-  geom_smooth(method = "lm", se = FALSE, color = "red") + 
-  ggtitle("Actual vs Predicted Home Scores") + 
-  xlab("Actual Home Scores") + 
-  ylab("Predicted Home Scores")
 
+#plot / evaluate the model
+
+comparison_data_away <- data.frame(Actual = dataTestAway$Away_score, Predicted = predicted_away_scores_test)
+
+ggplot(comparison_data_away, aes(x=Actual, y= Predicted))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE, color = "red")+
+  ggtitle("Actual vs Predicted Away Scores") + 
+  xlab("Actual Away Scores") + 
+  ylab("Predicted Away Scores")
+
+residuals_away <- comparison_data_away$Actual -comparison_data_away$Predicted
+valid_residuals_away <- residuals_away[!is.na(residuals_away)]
+rmse_away <- sqrt(mean(valid_residuals_away^2))
   
 #==============Score prediction model END============================================
 
 
-
-
-
-
-
-  
 # Feature Engineering:
 #   
 # Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
@@ -400,17 +429,3 @@ ggplot(comparison_data, aes(x = Actual, y = Predicted)) +
 # 
 # 
 # 
-# 
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -8,11 +8,9 @@ library(ggplot2)
 library(pROC)
 library(RSQLite)
 
-# to add R-Markdown file into the repo
+#===============================================================================================================to add R-Markdown file into the repo
 ---
-title: "NCAARegressionModel"
-author: "Modith Hadya, Sean Mulvihill"
-date: "2023-10-17"
+title: "Exploratory data analysis"
 output: html_document
 ---
 
@@ -20,8 +18,13 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Data preparation Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for the code related to transferring data into the database
 
-```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, include=FALSE}
+# Data Preprocessing
+
+Please refer to section 2.b in the README.MD for the code where extensive data cleaning is performed using SQL queries instead of Python. In Python, we solely rely on SQL queries to retrieve the already cleaned data.
+
+```{r eval=FALSE}
 library(tidymodels)
 library(skimr)
 library(rsample)
@@ -32,9 +35,41 @@ library(ggplot2)
 library(pROC)
 library(RSQLite)
 
+con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
+dbDisconnect(con)
+
+
+#Data Preparation
+# Load the datasets (box_scores.csv, fixture_information.csv, 
+# test_fixtures.csv) into R using functions like read.csv or 
+# any suitable function based on the file format.
+
+#connect to DB and pull the datasets 
+df_box_scores <- dbGetQuery(con, "SELECT * FROM box_scores")
+df_fixture_information <- dbGetQuery(con, "SELECT * FROM fixture_information")
+df_test_fixtures <- dbGetQuery(con, "SELECT * FROM test_fixtures")
+df_test_fixtures_actuals <- dbGetQuery(con, "SELECT * FROM test_fixtures_actuals")
 ```
 
 
+```{r message=FALSE, warning=FALSE}
+library(tidymodels)
+library(skimr)
+library(rsample)
+library(purrr)
+library(recipes)
+library(caret)
+library(ggplot2)
+library(pROC)
+library(RSQLite)
+con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
+df_box_scores <- dbGetQuery(con, "SELECT * FROM box_scores")
+dbDisconnect(con)
+
+knitr::kable(df_box_scores, caption = "df box score")
+```
+
+#===============================================================================================================to add R-Markdown file into the repo
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db") #connect to databse 
 

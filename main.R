@@ -329,6 +329,9 @@ dataTestHome <- testing(dataSplitHome)
 model_home <- model_home <- lm(Home_score ~ ., data=dataTrainHome)
 predicted_home_scores_test <- predict(model_home, newdata=dataTestHome)
 
+
+
+@@@@@check for the NA values in the test data #comment
 RMSE_home <- sqrt(mean((predicted_home_scores_test - dataTestHome$Home_score)^2))
 
 

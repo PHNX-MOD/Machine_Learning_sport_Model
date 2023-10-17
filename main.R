@@ -6,28 +6,10 @@ library(recipes)
 library(caret)
 library(ggplot2)
 library(pROC)
-
-
-starwars
-
-skim(starwars)
-view(starwars)
-
-
-# we need to sample our data i,e split into test and train, so we use R sample
-
-datareg_split <- initial_split(datareg)
-datareg_train <- training(datareg_split)
-datareg_test <- testing(datareg_split)
-
-
-
 library(RSQLite)
 
 
-con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
-dbDisconnect(con)
-
+con <- dbConnect(RSQLite::SQLite(), "mydatabase.db") #connect to databse 
 
 #Data Preparation
 # Load the datasets (box_scores.csv, fixture_information.csv, 
@@ -51,6 +33,7 @@ splitfun = unlist(strsplit(df_box_scores$FixtureKey[1], " "))
 team_names <- paste(unlist(strsplit(df_box_scores$FixtureKey[1], " "))[1:4], collapse = " ")
 date <- unlist(strsplit(df_box_scores$FixtureKey[1], " "))[5]
 
+dbDisconnect(con)  #disconnect the connection 
 
 # ====================Method one splitString ===============================================
 
@@ -67,10 +50,7 @@ dfBoxScores <-df_box_scores %>%rowwise()%>%
 dfBoxScores<- dfBoxScores%>%group_by(TeamName)%>%
   summarise(X2PA = mean(X2PA))
 
-
 # ====================Methods two splitString ============================================
-
-
 
 dfBoxScores2 <- df_box_scores %>%rowwise()%>%
   mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%
@@ -78,8 +58,6 @@ dfBoxScores2 <- df_box_scores %>%rowwise()%>%
   mutate(TeamName = trimws(TeamName))%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
-
-
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
 
@@ -192,9 +170,6 @@ JOIN Query1 AS Query3 ON Query2.Oppnent = Query3.TeamName
 #==========================================================queryEND======================
 
 dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
-
-
-
 
 fiter_box_scoreFun <- function(df){
   df%>%rowwise()%>%

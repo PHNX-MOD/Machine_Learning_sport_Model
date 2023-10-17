@@ -4,6 +4,8 @@ library(rsample)
 library(purrr)
 library(recipes)
 library(caret)
+library(ggplot2)
+
 
 starwars
 
@@ -293,11 +295,11 @@ dataTest <- testing(dataSplit)
 
 #Regression prediction model
 
-model <- glm(Winner ~ ., data=dataTrain, family=binomial())
+winner_prediction_model <- glm(Winner ~ ., data=dataTrain, family=binomial())
 
-predictions <- predict(model, newdata=dataTest, type="response")
-predicted_classes <- ifelse(predictions > 0.5, 1, 0)
-confusionMatrix(as.factor(predicted_classes), as.factor(dataTest$Winner))
+winner_predictions <- predict(winner_prediction_model, newdata=dataTest, type="response")
+winner_predicted_classes <- ifelse(predictions > 0.5, 1, 0)
+confusionMatrix(as.factor(winner_predicted_classes), as.factor(dataTest$Winner))
 
 
 #==============Prediction model ==================================end================ 
@@ -311,6 +313,7 @@ Final_ScoreAvgScores <- merge(Final_ScoreAvgScores, dfboxscoresMean, by.x = "Awa
 Final_ScoreAvgScores <- Final_ScoreAvgScores%>%select(Home, Away, HomeScoreAvg, AwayScoreAvg, Home_score, Away_score)
 
 
+#home prediction 
 Home_recipe <- Final_ScoreAvgScores %>% 
   recipe(Home_score ~ .) %>%
   step_dummy(Home, Away) %>%
@@ -324,8 +327,29 @@ dataTrainHome <- training(dataSplitHome)
 dataTestHome <- testing(dataSplitHome)
 
 model_home <- model_home <- lm(Home_score ~ ., data=dataTrainHome)
+predicted_home_scores_test <- predict(model_home, newdata=dataTestHome)
+
+RMSE_home <- sqrt(mean((predicted_home_scores_test - dataTestHome$Home_score)^2))
 
 
+
+
+
+
+#plotting the graph 
+comparison_data <- data.frame(Actual = dataTestHome$Home_score, Predicted = predicted_home_scores_test)
+
+ggplot(comparison_data, aes(x = Actual, y = Predicted)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, color = "red") + 
+  ggtitle("Actual vs Predicted Home Scores") + 
+  xlab("Actual Home Scores") + 
+  ylab("Predicted Home Scores")
+
+
+
+
+#away prediction
 Away_recipe <- Final_ScoreAvgScores %>% 
   recipe(Away_score  ~ .) %>%
   step_dummy(Home, Away) %>%
@@ -341,7 +365,20 @@ dataTestAway <- testing(dataSplitAway)
 
 model_away <- lm(Away_score ~ ., data=dataTrainAway)
 
+library(ggplot2)
+
+comparison_data <- data.frame(Actual = dataTestHome$Home_score, Predicted = predicted_home_scores_test)
+ggplot(comparison_data, aes(x = Actual, y = Predicted)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, color = "red") + 
+  ggtitle("Actual vs Predicted Home Scores") + 
+  xlab("Actual Home Scores") + 
+  ylab("Predicted Home Scores")
+
   
+#==============Score prediction model END============================================
+
+
 
 
 
@@ -354,13 +391,13 @@ model_away <- lm(Away_score ~ ., data=dataTrainAway)
 # Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
 # This can include an updated average performance score, total wins, total losses, etc.
 # 
-
-[Upcoming Match Data] -> [Score Estimation Model(s)] -> [Estimated Scores]
-[Estimated Scores + Other Match Data] -> [Original Winner Prediction Model] -> [Predicted Outcome]
-
-
-
-
+# 
+# [Upcoming Match Data] -> [Score Estimation Model(s)] -> [Estimated Scores]
+# [Estimated Scores + Other Match Data] -> [Original Winner Prediction Model] -> [Predicted Outcome]
+# 
+# 
+# 
+# 
 
 
 

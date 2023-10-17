@@ -309,13 +309,44 @@ Final_ScoreAvgScores <-  merge(Final_Score, dfboxscoresMean, by.x = "Home", by.y
 Final_ScoreAvgScores <- merge(Final_ScoreAvgScores, dfboxscoresMean, by.x = "Away", by.y = "TeamName", all.x = TRUE)%>%rename(AwayScoreAvg = Base_score)
 
 Final_ScoreAvgScores <- Final_ScoreAvgScores%>%select(Home, Away, HomeScoreAvg, AwayScoreAvg, Home_score, Away_score)
-head(Final_ScoreAvgScores,10)
 
 
+Home_recipe <- Final_ScoreAvgScores %>% 
+  recipe(Home_score ~ .) %>%
+  step_dummy(Home, Away) %>%
+  step_normalize(HomeScoreAvg , AwayScoreAvg)%>%
+  prep()
 
+processed_Home_data  <- juice(Home_recipe)
+
+dataSplitHome <- initial_split(processed_Home_data)
+dataTrainHome <- training(dataSplitHome)
+dataTestHome <- testing(dataSplitHome)
+
+model_home <- model_home <- lm(Home_score ~ ., data=dataTrainHome)
+
+
+Away_recipe <- Final_ScoreAvgScores %>% 
+  recipe(Away_score  ~ .) %>%
+  step_dummy(Home, Away) %>%
+  step_normalize(HomeScoreAvg , AwayScoreAvg)%>%
+  prep()
+
+processed_Away_data <- juice(Away_recipe)
+
+
+dataSplitAway <- initial_split(processed_Away_data)
+dataTrainAway <- training(dataSplitAway)
+dataTestAway <- testing(dataSplitAway)
+
+model_away <- lm(Away_score ~ ., data=dataTrainAway)
 
   
-  
+
+
+
+
+
   
 # Feature Engineering:
 #   
@@ -323,5 +354,23 @@ head(Final_ScoreAvgScores,10)
 # Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
 # This can include an updated average performance score, total wins, total losses, etc.
 # 
+
+[Upcoming Match Data] -> [Score Estimation Model(s)] -> [Estimated Scores]
+[Estimated Scores + Other Match Data] -> [Original Winner Prediction Model] -> [Predicted Outcome]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

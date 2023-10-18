@@ -8,70 +8,10 @@ library(ggplot2)
 library(pROC)
 library(RSQLite)
 
-#===============================================================================================================to add R-Markdown file into the repo
----
-title: "Exploratory data analysis"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-Data preparation Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for the code related to transferring data into the database
-
-# Data Preprocessing
-
-Please refer to section 2.b in the README.MD for the code where extensive data cleaning is performed using SQL queries instead of Python. In Python, we solely rely on SQL queries to retrieve the already cleaned data.
-
-```{r eval=FALSE}
-library(tidymodels)
-library(skimr)
-library(rsample)
-library(purrr)
-library(recipes)
-library(caret)
-library(ggplot2)
-library(pROC)
-library(RSQLite)
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
 dbDisconnect(con)
 
-
-#Data Preparation
-# Load the datasets (box_scores.csv, fixture_information.csv, 
-# test_fixtures.csv) into R using functions like read.csv or 
-# any suitable function based on the file format.
-
-#connect to DB and pull the datasets 
-df_box_scores <- dbGetQuery(con, "SELECT * FROM box_scores")
-df_fixture_information <- dbGetQuery(con, "SELECT * FROM fixture_information")
-df_test_fixtures <- dbGetQuery(con, "SELECT * FROM test_fixtures")
-df_test_fixtures_actuals <- dbGetQuery(con, "SELECT * FROM test_fixtures_actuals")
-```
-
-
-```{r message=FALSE, warning=FALSE}
-library(tidymodels)
-library(skimr)
-library(rsample)
-library(purrr)
-library(recipes)
-library(caret)
-library(ggplot2)
-library(pROC)
-library(RSQLite)
-con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
-df_box_scores <- dbGetQuery(con, "SELECT * FROM box_scores")
-dbDisconnect(con)
-
-knitr::kable(df_box_scores, caption = "df box score")
-```
-
-#===============================================================================================================to add R-Markdown file into the repo
-
-con <- dbConnect(RSQLite::SQLite(), "mydatabase.db") #connect to databse 
 
 #Data Preparation
 # Load the datasets (box_scores.csv, fixture_information.csv, 
@@ -95,7 +35,6 @@ splitfun = unlist(strsplit(df_box_scores$FixtureKey[1], " "))
 team_names <- paste(unlist(strsplit(df_box_scores$FixtureKey[1], " "))[1:4], collapse = " ")
 date <- unlist(strsplit(df_box_scores$FixtureKey[1], " "))[5]
 
-dbDisconnect(con)  #disconnect the connection 
 
 # ====================Method one splitString ===============================================
 
@@ -112,7 +51,10 @@ dfBoxScores <-df_box_scores %>%rowwise()%>%
 dfBoxScores<- dfBoxScores%>%group_by(TeamName)%>%
   summarise(X2PA = mean(X2PA))
 
+
 # ====================Methods two splitString ============================================
+
+
 
 dfBoxScores2 <- df_box_scores %>%rowwise()%>%
   mutate(TeamAvTeamB = sub(" \\d{2}-\\w{3}-\\d{4}$", "", FixtureKey))%>%
@@ -120,6 +62,8 @@ dfBoxScores2 <- df_box_scores %>%rowwise()%>%
   mutate(TeamName = trimws(TeamName))%>%
   select(!TeamAvTeamB)%>%
   select(TeamName,FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF)
+
+
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
 
@@ -233,6 +177,7 @@ JOIN Query1 AS Query3 ON Query2.Oppnent = Query3.TeamName
 
 dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
 
+
 fiter_box_scoreFun <- function(df){
   df%>%rowwise()%>%
     mutate(Date = strsplit(FixtureKey, " ")[[1]]
@@ -280,6 +225,7 @@ fiter_box_scoreFun <- function(df){
     ))%>%select(FixtureKey, TeamName,Oppnent,Base_score)
 }
 
+
 dfBoxScores <- fiter_box_scoreFun(dfBoxScoresFromQuery)
 
 dfBoxScoresHome<- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "Yes")
@@ -303,7 +249,7 @@ dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBox
 
 
 
-#==============Prediction model ====================================================================
+#==============winner Prediction model ====================================================================
 
 data <- Final_Score %>%select(!FixtureKey)%>%
   mutate(Winner = if_else(Home_score > Away_score, 1, 0))
@@ -383,11 +329,22 @@ Final_ScoreAvgScores <- merge(Final_ScoreAvgScores, dfboxscoresMean, by.x = "Awa
 Final_ScoreAvgScores <- Final_ScoreAvgScores%>%select(Home, Away, HomeScoreAvg, AwayScoreAvg, Home_score, Away_score)
 
 
-#home prediction 
-Home_recipe <- Final_ScoreAvgScores %>% 
-  recipe(Home_score ~ .) %>%
+#=================================old hot coding ====================================
+#hot coding using recipe library
+
+data_recipe <- data %>% 
+  recipe() %>%
   step_dummy(Home, Away) %>%
-  step_normalize(HomeScoreAvg , AwayScoreAvg)%>%
+  step_normalize(all_numeric(), -Winner) %>%
+  prep()
+
+
+#=================================old hot coding ====================================
+
+#home prediction 
+Home_recipe <- recipe(Home_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=Final_ScoreAvgScores) %>%
+  step_dummy(Home, Away, one_hot=TRUE) %>%
+  step_normalize(HomeScoreAvg, AwayScoreAvg) %>%
   prep()
 
 processed_Home_data  <- juice(Home_recipe)
@@ -396,10 +353,10 @@ dataSplitHome <- initial_split(processed_Home_data)
 dataTrainHome <- training(dataSplitHome)
 dataTestHome <- testing(dataSplitHome)
 
-model_home <- model_home <- lm(Home_score ~ ., data=dataTrainHome)
+
+model_home <- lm(Home_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=dataTrainHome)
+
 predicted_home_scores_test <- predict(model_home, newdata=dataTestHome)
-
-
 
 #plotting the graph / Evaluate the models 
 comparison_data_home <- data.frame(Actual = dataTestHome$Home_score, Predicted = predicted_home_scores_test)
@@ -418,11 +375,11 @@ rmse_home <- sqrt(mean(valid_residuals^2))
 
 
 #away prediction
-Away_recipe <- Final_ScoreAvgScores %>% 
-  recipe(Away_score  ~ .) %>%
+Away_recipe <- recipe(Away_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=Final_ScoreAvgScores) %>%
   step_dummy(Home, Away) %>%
-  step_normalize(HomeScoreAvg , AwayScoreAvg)%>%
+  step_normalize(HomeScoreAvg, AwayScoreAvg) %>%
   prep()
+
 
 processed_Away_data <- juice(Away_recipe)
 
@@ -431,7 +388,7 @@ dataSplitAway <- initial_split(processed_Away_data)
 dataTrainAway <- training(dataSplitAway)
 dataTestAway <- testing(dataSplitAway)
 
-model_away <- lm(Away_score ~ ., data=dataTrainAway)
+model_home <- lm(Away_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=dataTrainAway)
 
 predicted_away_scores_test <- predict(model_away, newdata =dataTestAway )
 
@@ -453,7 +410,34 @@ rmse_away <- sqrt(mean(valid_residuals_away^2))
   
 #==============Score prediction model END============================================
 
+#===============Score Prediction ===================================
 
+df_test_fixtures <- df_test_fixtures%>%rowwise()%>%
+  mutate(
+    SplittedString = strsplit(FixtureKey, " "),
+    TeamAvTeamB = paste(unlist(SplittedString[-length(SplittedString)]), collapse = " ")
+  )%>%
+  mutate(Home = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][1],
+         Away = strsplit(TeamAvTeamB, "(?<!V)v", perl = TRUE)[[1]][2],
+         Home =  trimws(Home),
+         Away = trimws(Away),
+         Date = strsplit(FixtureKey, " ")[[1]]
+         [length(strsplit(FixtureKey, " ")[[1]])]
+  )%>%
+  select(Date, Home, Away)
+
+upcoming_match <- df_test_fixtures%>%select(!Date)
+
+
+upcoming_match <-  merge(upcoming_match, dfboxscoresMean, by.x = "Home", by.y = "TeamName", all.x = TRUE)%>%rename(HomeScoreAvg = Base_score)
+upcoming_match <- merge(upcoming_match, dfboxscoresMean, by.x = "Away", by.y = "TeamName", all.x = TRUE)%>%rename(AwayScoreAvg = Base_score)
+
+predicted_home_score <- predict(model_home, newdata=upcoming_match)
+
+
+
+
+  
 # Feature Engineering:
 #   
 # Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
@@ -466,3 +450,17 @@ rmse_away <- sqrt(mean(valid_residuals_away^2))
 # 
 # 
 # 
+# 
+
+
+
+
+
+
+
+
+
+
+
+
+

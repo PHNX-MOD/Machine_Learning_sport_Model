@@ -7,6 +7,7 @@ output:
     toc: yes
     toc_depth: 3
     toc_float: yes
+    code_folding: hide
 ---
 
 # Data preparation
@@ -16,7 +17,7 @@ Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for t
 Please refer to section 2.b in the README.MD for the code where extensive data cleaning is performed using SQL queries instead of Python. In Python, we solely rely on SQL queries to retrieve the already cleaned data.
 
 ## libraries and the main Query 
-```{r message=FALSE} 
+```{r message=FALSE, echo=FALSE} 
 library(tidymodels)
 library(skimr)
 library(rsample)
@@ -141,7 +142,7 @@ dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
 ## Data Preprocessing (dplyr)
 Further the table is cleaned using dplyr
 
-```{r message=FALSE}
+```{r message=FALSE, echo=FALSE}
 
 fiter_box_scoreFun <- function(df){
   df%>%rowwise()%>%

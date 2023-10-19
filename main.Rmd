@@ -1,7 +1,12 @@
 ---
 title: "Exploratory data analysis"
 output:
-  html_document
+  html_document:
+    fig_caption: yes
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
 ---
 
 # Data preparation

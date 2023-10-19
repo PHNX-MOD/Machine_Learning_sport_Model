@@ -1,5 +1,8 @@
 ---
 title: "Exploratory data analysis"
+output:
+  github_document:
+    html_preview: false
 ---
 
 # Data preparation

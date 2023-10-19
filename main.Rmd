@@ -1,8 +1,7 @@
 ---
 title: "Exploratory data analysis"
 output:
-  github_document:
-    html_preview: false
+  html_document
 ---
 
 # Data preparation
@@ -12,5 +11,6 @@ Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for t
 Please refer to section 2.b in the README.MD for the code where extensive data cleaning is performed using SQL queries instead of Python. In Python, we solely rely on SQL queries to retrieve the already cleaned data.
 
 ```{r} 
-summary(iris)  
+summary(iris)
+#iris
 ```

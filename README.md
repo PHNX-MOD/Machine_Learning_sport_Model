@@ -20,7 +20,7 @@ As an initial step, the project delves into the rich repository of NCAA basketba
 #### working files
 
 Exploratory data analysis <br />
-[main.R](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.R) <br />
+[main.R]([https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.R](https://phnx-mod.github.io/Machine_Learning_sport_Model/)) <br />
 [main.ipynb](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.ipynb)
 
 #### Working Directories 

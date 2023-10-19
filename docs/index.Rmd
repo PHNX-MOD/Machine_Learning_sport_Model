@@ -3,21 +3,56 @@ title: "Exploratory data analysis"
 output:
   html_document:
     fig_caption: yes
-    theme: cerulean
+    theme:
+      bg: "#0f141f"
+      fg: "#e4f4f5"
+      primary: "#39db30"
+      base_font:
+        google: Prompt
+      heading_font:
+        google: Proza Libre
+      version: 3
     toc: yes
     toc_depth: 3
     toc_float: yes
     code_folding: hide
 ---
 
-# Data preparation
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<style>
+h1 {
+  color: #c9f765;
+  text-align: center;
+  border-bottom: 3px solid #333; 
+  padding-bottom: 0.5em;
+}
+h2 {
+  border-bottom: 1px solid #333; 
+  padding-bottom: 0.5em;
+  color: #43dee8;
+  text-align: center;
+  }
+
+h3, h4, h5, h6 {
+  border-bottom: 0.5px solid #333; 
+  padding-bottom: 0.5em;
+  color: #4385e8;
+  text-align: center;
+}
+
+</style>
+
+## Data preparation
 Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for the code related to transferring data into the database
 
-# Data Preprocessing
+## Data Preprocessing
 Please refer to section 2.b in the README.MD for the code where extensive data cleaning is performed using SQL queries instead of Python. In Python, we solely rely on SQL queries to retrieve the already cleaned data.
 
-## libraries & main Query 
-Pulled from the database here is the cleaned table within the query(RSQLite. Please use Show/Hide to display the code.
+### Libraries/Main Query 
+Pulled from the database here is the cleaned table within the query(RSQLite). Please use Show/Hide to display the code.
 
 ```{r message=FALSE, echo=TRUE} 
 library(tidymodels)
@@ -30,7 +65,7 @@ library(ggplot2)
 library(pROC)
 library(RSQLite)
 library(DT)
-
+library(flexdashboard)
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
 
 #================================query================================================
@@ -143,7 +178,7 @@ datatable(head(dfBoxScoresFromQuery, 100),
           options = list(scrollX = TRUE))
 
 ```
-## Data Preprocessing (dplyr)
+### Data Preprocessing (dplyr)
 Further the table is cleaned using dplyr
 
 ```{r message=FALSE, echo=FALSE}
@@ -195,9 +230,6 @@ fiter_box_scoreFun <- function(df){
     ))%>%select(FixtureKey, TeamName,Oppnent,Base_score)
 }
 
-```
-
-```{r message=FALSE}
 
 dfBoxScores <- fiter_box_scoreFun(dfBoxScoresFromQuery)
 
@@ -207,7 +239,162 @@ dfBoxScoresHome <- fiter_box_scoreFun(dfBoxScoresHome)
 dfBoxScoresAway<- dfBoxScoresFromQuery%>%filter(HomeTeamAdv == "No")
 dfBoxScoresAway <- fiter_box_scoreFun(dfBoxScoresAway)
 
-datatable(dfBoxScores)
+
+Final_Score <- merge(dfBoxScoresHome%>%rename(Home = TeamName, Away=Oppnent, Home_score = Base_score),
+                     dfBoxScoresAway%>%rename(Away = TeamName, Home=Oppnent, Away_score = Base_score))%>%
+  mutate(Home_score = round(Home_score,2),
+         Away_score = round(Away_score,2))
+  
+
+dfboxscoresMean <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBoxScoresAway%>%select(-Oppnent, -FixtureKey ))%>%
+  group_by(TeamName)%>%summarise(Base_score = mean(Base_score))
+
+dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBoxScoresAway%>%select(-Oppnent, -FixtureKey ))%>%
+  group_by(TeamName)%>%summarise(Base_score = median(Base_score))
+
+
+datatable(Final_Score)
+```
+
+## Winner Prediction model
+
+```{r message=FALSE}
+#==============winner Prediction model ====================================================================
+
+data <- Final_Score %>%select(!FixtureKey)%>%
+  mutate(Winner = if_else(Home_score > Away_score, 1, 0))
+
+#hot coding using  carret library
+
+dummies_model <- dummyVars(Winner ~ ., data=data)
+data_transformed <- predict(dummies_model, newdata = data)
+data_encoded <- as.data.frame(data_transformed)
+normalize <- function(feature){(feature-mean(feature))/sd(feature)}
+
+
+#hot coding using recipe library
+
+data_recipe <- data %>% 
+  recipe() %>%
+  step_dummy(Home, Away) %>%
+  step_normalize(all_numeric(), -Winner) %>%
+  prep()
+  
+data_normalized <- juice(data_recipe)
+
+dataSplit <- initial_split(data_normalized)
+dataTrain <- training(dataSplit)
+dataTest <- testing(dataSplit)
+
+
+#Regression prediction model
+
+winner_prediction_model <- glm(Winner ~ ., data=dataTrain, family=binomial())
+
+
+#check for the NA values / residuals tune the model 
+
+winner_predictions <- predict(winner_prediction_model, newdata=dataTest, type="response")
+
+
+#plot & evaluate the model
+
+observed_values <- dataTest$Winner
+
+winner_predictions <- winner_predictions[!is.na(winner_predictions)]
+observed_values <- observed_values[!is.na(observed_values)]
+
+rmse_winner <- sqrt(mean((winner_predictions - observed_values)^2))
+
+#plot 
+roc_obj <- roc(observed_values, winner_predictions)
+
+winner_prediction_plot <- ggplot(data = data.frame(
+  FPR = roc_obj$specificities,
+  TPR = roc_obj$sensitivities
+)) +
+  geom_line(aes(x = FPR, y = TPR), color="blue") +
+  geom_abline(intercept = 0, slope = 1, color="gray") +
+  ggtitle("ROC Curve") +
+  labs(x="False Positive Rate (1-Specificity)", y="True Positive Rate (Sensitivity)") +
+  annotate("text", x = 0.3, y = 0.2, label = paste("AUC =", round(auc(roc_obj), 2)))
+
+winner_prediction_plot
+```
+
+## Score Prediction Model
+### Score Prediction Model
+
+```{r message=FALSE}
+Final_ScoreAvgScores <-  merge(Final_Score, dfboxscoresMean, by.x = "Home", by.y = "TeamName", all.x = TRUE)%>%rename(HomeScoreAvg = Base_score)%>%select(-FixtureKey)
+Final_ScoreAvgScores <- merge(Final_ScoreAvgScores, dfboxscoresMean, by.x = "Away", by.y = "TeamName", all.x = TRUE)%>%rename(AwayScoreAvg = Base_score)
+
+Final_ScoreAvgScores <- Final_ScoreAvgScores%>%select(Home, Away, HomeScoreAvg, AwayScoreAvg, Home_score, Away_score)
+
+Home_recipe <- recipe(Home_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=Final_ScoreAvgScores) %>%
+  step_dummy(Home, Away, one_hot=TRUE) %>%
+  step_normalize(HomeScoreAvg, AwayScoreAvg) %>%
+  prep()
+
+processed_Home_data  <- juice(Home_recipe)
+
+dataSplitHome <- initial_split(processed_Home_data)
+dataTrainHome <- training(dataSplitHome)
+dataTestHome <- testing(dataSplitHome)
+
+
+model_home <- lm(Home_score ~ HomeScoreAvg + AwayScoreAvg, data=dataTrainHome)
+
+predicted_home_scores_test <- predict(model_home, newdata=dataTestHome)
+
+#plotting the graph / Evaluate the models 
+comparison_data_home <- data.frame(Actual = dataTestHome$Home_score, Predicted = predicted_home_scores_test)
+
+homeScore_predictionModel <-ggplot(comparison_data_home, aes(x = Actual, y = Predicted)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", se = FALSE, color = "red") + 
+  ggtitle("Actual vs Predicted Home Scores") + 
+  xlab("Actual Home Scores") + 
+  ylab("Predicted Home Scores")
+
+homeScore_predictionModel
+
+```
+
+### Away Prediction Model
+
+```{r message=FALSE}
+
+Away_recipe <- recipe(Away_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=Final_ScoreAvgScores) %>%
+  step_dummy(Home, Away) %>%
+  step_normalize(HomeScoreAvg, AwayScoreAvg) %>%
+  prep()
+
+processed_Away_data <- juice(Away_recipe)
+
+
+dataSplitAway <- initial_split(processed_Away_data)
+dataTrainAway <- training(dataSplitAway)
+dataTestAway <- testing(dataSplitAway)
+
+model_away <- lm(Away_score ~ HomeScoreAvg + AwayScoreAvg, data=dataTrainAway)
+
+predicted_away_scores_test <- predict(model_away, newdata =dataTestAway )
+
+
+#plot / evaluate the model
+
+comparison_data_away <- data.frame(Actual = dataTestAway$Away_score, Predicted = predicted_away_scores_test)
+
+awayScore_predictionModel <- ggplot(comparison_data_away, aes(x=Actual, y= Predicted))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE, color = "red")+
+  ggtitle("Actual vs Predicted Away Scores") + 
+  xlab("Actual Away Scores") + 
+  ylab("Predicted Away Scores")
+
+awayScore_predictionModel
+
 ```
 
 

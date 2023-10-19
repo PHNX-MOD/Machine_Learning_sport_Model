@@ -16,8 +16,10 @@ Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for t
 # Data Preprocessing
 Please refer to section 2.b in the README.MD for the code where extensive data cleaning is performed using SQL queries instead of Python. In Python, we solely rely on SQL queries to retrieve the already cleaned data.
 
-## libraries and the main Query 
-```{r message=FALSE, echo=FALSE} 
+## libraries & main Query 
+Pulled from the database here is the cleaned table within the query(RSQLite. Please use Show/Hide to display the code.
+
+```{r message=FALSE, echo=TRUE} 
 library(tidymodels)
 library(skimr)
 library(rsample)
@@ -137,6 +139,8 @@ JOIN Query1 AS Query3 ON Query2.Oppnent = Query3.TeamName
 
 dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
 
+datatable(head(dfBoxScoresFromQuery, 100),
+          options = list(scrollX = TRUE))
 
 ```
 ## Data Preprocessing (dplyr)

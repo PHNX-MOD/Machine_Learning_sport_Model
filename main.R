@@ -254,32 +254,23 @@ dfboxscoreMeadian <- rbind(dfBoxScoresHome%>%select(-Oppnent, -FixtureKey),dfBox
 data <- Final_Score %>%select(!FixtureKey)%>%
   mutate(Winner = if_else(Home_score > Away_score, 1, 0))
 
-#hot coding using  carret library
-
-dummies_model <- dummyVars(Winner ~ ., data=data)
-data_transformed <- predict(dummies_model, newdata = data)
-data_encoded <- as.data.frame(data_transformed)
-normalize <- function(feature){(feature-mean(feature))/sd(feature)}
-
-
-#hot coding using recipe library
-
-data_recipe <- data %>% 
-  recipe() %>%
-  step_dummy(Home, Away) %>%
-  step_normalize(all_numeric(), -Winner) %>%
-  prep()
-  
-data_normalized <- juice(data_recipe)
-
-dataSplit <- initial_split(data_normalized)
+dataSplit <- initial_split(data)
 dataTrain <- training(dataSplit)
 dataTest <- testing(dataSplit)
 
 
+#hot coding using recipe library
+
+training_recipe <- recipe(Winner ~ ., data=dataTrain) %>%
+  step_dummy(Home, Away) %>%
+  prep()
+  
+
+encoded_training_data <- bake(training_recipe, dataTrain)
+
 #Regression prediction model
 
-winner_prediction_model <- glm(Winner ~ ., data=dataTrain, family=binomial())
+winner_prediction_model <- glm(Winner ~ ., family=binomial, data=encoded_training_data)
 
 
 #check for the NA values / residuals tune the model 
@@ -329,19 +320,9 @@ Final_ScoreAvgScores <- merge(Final_ScoreAvgScores, dfboxscoresMean, by.x = "Awa
 Final_ScoreAvgScores <- Final_ScoreAvgScores%>%select(Home, Away, HomeScoreAvg, AwayScoreAvg, Home_score, Away_score)
 
 
-#=================================old hot coding ====================================
-#hot coding using recipe library
-
-data_recipe <- data %>% 
-  recipe() %>%
-  step_dummy(Home, Away) %>%
-  step_normalize(all_numeric(), -Winner) %>%
-  prep()
-
-
-#=================================old hot coding ====================================
 
 #home prediction 
+
 Home_recipe <- recipe(Home_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=Final_ScoreAvgScores) %>%
   step_dummy(Home, Away, one_hot=TRUE) %>%
   step_normalize(HomeScoreAvg, AwayScoreAvg) %>%
@@ -354,7 +335,7 @@ dataTrainHome <- training(dataSplitHome)
 dataTestHome <- testing(dataSplitHome)
 
 
-model_home <- lm(Home_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=dataTrainHome)
+model_home <- lm(Home_score ~ ., data=dataTrainHome)
 
 predicted_home_scores_test <- predict(model_home, newdata=dataTestHome)
 
@@ -388,7 +369,7 @@ dataSplitAway <- initial_split(processed_Away_data)
 dataTrainAway <- training(dataSplitAway)
 dataTestAway <- testing(dataSplitAway)
 
-model_home <- lm(Away_score ~ Home + Away + HomeScoreAvg + AwayScoreAvg, data=dataTrainAway)
+model_away <- lm(Away_score ~ ., data=dataTrainAway)
 
 predicted_away_scores_test <- predict(model_away, newdata =dataTestAway )
 
@@ -429,15 +410,98 @@ df_test_fixtures <- df_test_fixtures%>%rowwise()%>%
 upcoming_match <- df_test_fixtures%>%select(!Date)
 
 
+
+
 upcoming_match <-  merge(upcoming_match, dfboxscoresMean, by.x = "Home", by.y = "TeamName", all.x = TRUE)%>%rename(HomeScoreAvg = Base_score)
 upcoming_match <- merge(upcoming_match, dfboxscoresMean, by.x = "Away", by.y = "TeamName", all.x = TRUE)%>%rename(AwayScoreAvg = Base_score)
 
-predicted_home_score <- predict(model_home, newdata=upcoming_match)
+#predicted_home_scores=================================
+
+processed_upcoming_fixture_home <- bake(Home_recipe, new_data = upcoming_match)
+predicted_home_scores <- predict(model_home, newdata=processed_upcoming_fixture_home)
+
+
+#predicted_away_scores=======================================
+
+processed_upcoming_fixture_away <- bake(Away_recipe, new_data = upcoming_match)
+
+
+#(predvars, data, env) : object 'Home_ABILCH' not found, adding a  column filled with zero
+missing_cols <- setdiff(names(processed_Away_data), names(processed_upcoming_fixture_away))
+for(col in missing_cols) {
+  processed_upcoming_fixture_away[[col]] <- 0
+}
+
+predicted_away_scores <- predict(model_away, newdata=processed_upcoming_fixture_away)
 
 
 
+upcoming_match_with_scores  <- cbind(upcoming_match, predicted_home_scores, predicted_away_scores)%>%
+  select(!c(HomeScoreAvg,AwayScoreAvg))%>%
+  mutate(across(everything(), ~replace_na(.x, 0)))%>%
+  rename(Home_score = predicted_home_scores, Away_score = predicted_away_scores)
 
+
+encoded_upcoming_matches <- bake(training_recipe, upcoming_match_with_scores)
+
+predicted_outcome <- predict(winner_prediction_model, newdata=encoded_upcoming_matches, type="response")
+predicted_winner <- ifelse(predicted_outcome > 0.5, "Home", "Away")
+
+
+upcoming_fixture_predictions <- cbind(upcoming_match_with_scores, predicted_winner)
+upcoming_fixture_predictions <- upcoming_fixture_predictions%>%mutate(Home_score = round(Home_score, 2),
+                                      Away_score = round(Away_score , 2),
+                                      Spread = Away_score-Home_score,
+                                      Totals = Away_score+Home_score)
+
+
+
+#calculating the winning percentage based on spread 
+
+spread <- c(1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18, 18.5, 19)
+win_percentage <- c(0.517, 0.533, 0.574, 0.573, 0.573, 0.587, 0.651, 0.654, 0.664, 0.695, 0.698, 0.719, 0.750, 0.740, 0.806, 0.802, 0.783, 0.843, 0.843, 0.858, 0.868, 0.875, 0.879, 0.895, 0.884, 0.937, 0.890, 0.945, 0.912, 0.948, 0.910, 0.944, 0.933, 0.961, 0.950, 0.959, 1.000)
+
+win_per_table <- data.frame(spread, win_percentage)
+
+
+
+# Function to interpolate Win% for a given spread
+interpolate_win_percentage <- function(spread_val, win_per_table) {
+  # If spread greater than 19, return NA
+  if (spread_val > 19) {
+    return(NA_real_)
+  }
   
+  lower_row <- win_per_table %>% filter(spread <= spread_val) %>% arrange(desc(spread)) %>% slice(1)
+  upper_row <- win_per_table %>% filter(spread > spread_val) %>% arrange(spread) %>% slice(1)
+  
+  if (nrow(lower_row) == 0) {
+    return(upper_row$win_percentage)
+  }
+  if (nrow(upper_row) == 0) {
+    return(lower_row$win_percentage)
+  }
+  
+  x1 <- lower_row$spread
+  y1 <- lower_row$win_percentage
+  x2 <- upper_row$spread
+  y2 <- upper_row$win_percentage
+  
+  # Interpolation formula
+  y = y1 + ((spread_val - x1) * (y2 - y1)) / (x2 - x1)
+  
+  return(y)
+}
+
+# Mutate upcoming_fix with the interpolated Win%
+upcoming_fix <- upcoming_fixture_predictions %>%
+  rowwise() %>%
+  mutate(WinPercentage = interpolate_win_percentage(abs(Spread),win_per_table ))
+
+
+
+
+
 # Feature Engineering:
 #   
 # Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
@@ -449,11 +513,16 @@ predicted_home_score <- predict(model_home, newdata=upcoming_match)
 # [Estimated Scores + Other Match Data] -> [Original Winner Prediction Model] -> [Predicted Outcome]
 # 
 # 
-# 
-# 
+#Your logistic regression model may not be well-calibrated. When a model is well-calibrated, the predicted probabilities 
+# can be directly interpreted. For instance, a predicted probability of 0.8 should correspond to 80% chances of 
+# the event occurring. 
+# he model is extremely confident about its predictions. 
+# This can be due to overfitting or certain features heavily influencing the model's decision boundary.
 
 
-
+#The model seems reasonably accurate for scores in the middle range but struggles more with extreme scores, both high and low.
+#There's a tendency for the model to underpredict especially high scores and possibly to overpredict especially low scores
+#The scatter might indicate that the model could benefit from additional complexity or feature engineering, especially to handle the extremes better.
 
 
 

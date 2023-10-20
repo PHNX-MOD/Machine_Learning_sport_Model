@@ -45,6 +45,9 @@ h3, h4, h5, h6 {
 
 </style>
 
+EDA represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years. The objective is to build a model that is able to predict the winners for the upcoming fixtures.
+The Raw data contains > FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF 
+
 ## Data preparation
 Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for the code related to transferring data into the database
 
@@ -52,7 +55,8 @@ Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for t
 Please refer to section 2.b in the README.MD for the code where extensive data cleaning is performed using SQL queries instead of Python. In Python, we solely rely on SQL queries to retrieve the already cleaned data.
 
 ### Libraries/Main Query 
-Pulled from the database here is the cleaned table within the query(RSQLite). Please use Show/Hide to display the code.
+Performing extensive data cleaning within SQL queries focuses on data preprocessing. Specifically, it addresses the task of making the initial calculations to obtain the necessary variables to cacluate the base score of each team within the fixture.
+
 
 ```{r message=FALSE, echo=TRUE} 
 library(tidymodels)
@@ -179,9 +183,9 @@ datatable(head(dfBoxScoresFromQuery, 100),
 
 ```
 ### Data Preprocessing (dplyr)
-Further the table is cleaned using dplyr
+Further the table is cleaned using dplyr. Task of splitting the columns in the data obtained from the initial data preparation is done here, which are initially in the format TeamA_v_TeamB Date' into separate team names. This separation allows for more efficient and structured analysis of each team's aggregate statistics
 
-```{r message=FALSE, echo=FALSE}
+```{r message=FALSE}
 
 fiter_box_scoreFun <- function(df){
   df%>%rowwise()%>%
@@ -257,6 +261,7 @@ datatable(Final_Score)
 ```
 
 ## Winner Prediction model
+A separate winner prediction model is created here.
 
 ```{r message=FALSE}
 #==============winner Prediction model ====================================================================
@@ -323,7 +328,7 @@ winner_prediction_plot
 ```
 
 ## Score Prediction Model
-### Score Prediction Model
+### Home
 
 ```{r message=FALSE}
 Final_ScoreAvgScores <-  merge(Final_Score, dfboxscoresMean, by.x = "Home", by.y = "TeamName", all.x = TRUE)%>%rename(HomeScoreAvg = Base_score)%>%select(-FixtureKey)
@@ -361,7 +366,7 @@ homeScore_predictionModel
 
 ```
 
-### Away Prediction Model
+### Away
 
 ```{r message=FALSE}
 

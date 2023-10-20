@@ -328,7 +328,7 @@ winner_prediction_plot
 ```
 
 ## Score Prediction Model
-### Home
+### Home(regression Plot)
 
 ```{r message=FALSE}
 Final_ScoreAvgScores <-  merge(Final_Score, dfboxscoresMean, by.x = "Home", by.y = "TeamName", all.x = TRUE)%>%rename(HomeScoreAvg = Base_score)%>%select(-FixtureKey)
@@ -366,7 +366,7 @@ homeScore_predictionModel
 
 ```
 
-### Away
+### Away(regression Plot)
 
 ```{r message=FALSE}
 

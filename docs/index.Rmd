@@ -48,6 +48,8 @@ h3, h4, h5, h6 {
 EDA represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years. The objective is to build a model that is able to predict the winners for the upcoming fixtures.
 The Raw data contains > FixtureKey,Team,X2PM,X2PA,X3PM,X3PA,FTM,FTA,ORB,DRB,AST,STL,BLK,TOV,PF 
 
+The EDA itself is an exploratory section in the project, hence the simplistic regression model is adopted in the process. Not much effort is taken into evaluate the model or calibrate the model as the focus of the assessment is something else. The winner prediction model here extremely confident in its predictions, this can be due to overfitting or certain features heavily influencing the model's decision boundary. One of the main reason is the base score calcutaion itself is based on the variables that have low confidence. 
+
 ## Data preparation
 Please refer to section 2.a, titled 'Data preprocessing,' in the README.MD for the code related to transferring data into the database
 
@@ -318,6 +320,9 @@ winner_prediction_plot
 ```
 
 ## Score Prediction Model
+The models seems reasonably accurate for scores in the middle range but struggles more with extreme scores, both high and low. There's a tendency for the models to under predict especially high scores and possibly to over predict especially low scores. This is obvious as the model is lacking evaluation and the feature engineering.
+
+
 ### Home(regression Plot)
 
 ```{r message=FALSE}
@@ -422,8 +427,6 @@ df_test_fixtures <- df_test_fixtures%>%rowwise()%>%
 upcoming_match <- df_test_fixtures%>%select(!Date)
 
 
-
-
 upcoming_match <-  merge(upcoming_match, dfboxscoresMean, by.x = "Home", by.y = "TeamName", all.x = TRUE)%>%rename(HomeScoreAvg = Base_score)
 upcoming_match <- merge(upcoming_match, dfboxscoresMean, by.x = "Away", by.y = "TeamName", all.x = TRUE)%>%rename(AwayScoreAvg = Base_score)
 
@@ -432,17 +435,105 @@ datatable(upcoming_match%>%mutate(HomeScoreAvg= round(HomeScoreAvg,2),
 
 ```
 
+### Score Prediction
+ Predicting home and away scores for the upcoming fixtures
 
 ```{r message=FALSE}
+processed_upcoming_fixture_home <- bake(Home_recipe, new_data = upcoming_match)
+predicted_home_scores <- predict(model_home, newdata=processed_upcoming_fixture_home)
 
 
+processed_upcoming_fixture_away <- bake(Away_recipe, new_data = upcoming_match)
 
 
+#(predvars, data, env) : object 'Home_ABILCH' not found, adding a  column filled with zero
+missing_cols <- setdiff(names(processed_Away_data), names(processed_upcoming_fixture_away))
+for(col in missing_cols) {
+  processed_upcoming_fixture_away[[col]] <- 0
+}
+
+predicted_away_scores <- predict(model_away, newdata=processed_upcoming_fixture_away)
+
+upcoming_match_with_scores  <- cbind(upcoming_match, predicted_home_scores, predicted_away_scores)%>%
+  select(!c(HomeScoreAvg,AwayScoreAvg))%>%
+  mutate(across(everything(), ~replace_na(.x, 0)))%>%
+  rename(Home_score = predicted_home_scores, Away_score = predicted_away_scores)
+
+datatable(upcoming_match_with_scores%>%mutate(Home_score= round(Home_score,2),
+                                   Away_score= round(Away_score, 2)))
 ```
 
 
 
+```{r message=FALSE, echo=FALSE}
+encoded_upcoming_matches <- bake(training_recipe, upcoming_match_with_scores)
 
+predicted_outcome <- predict(winner_prediction_model, newdata=encoded_upcoming_matches, type="response")
+predicted_winner <- ifelse(predicted_outcome > 0.5, "Home", "Away")
+
+
+upcoming_fixture_predictions <- cbind(upcoming_match_with_scores, predicted_winner)
+upcoming_fixture_predictions <- upcoming_fixture_predictions%>%mutate(Home_score = round(Home_score, 2),
+                                      Away_score = round(Away_score , 2),
+                                      Spread = Away_score-Home_score,
+                                      Totals = Away_score+Home_score)
+
+
+
+#calculating the winning percentage based on spread 
+
+spread <- c(1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 16.5, 17, 17.5, 18, 18.5, 19)
+win_percentage <- c(0.517, 0.533, 0.574, 0.573, 0.573, 0.587, 0.651, 0.654, 0.664, 0.695, 0.698, 0.719, 0.750, 0.740, 0.806, 0.802, 0.783, 0.843, 0.843, 0.858, 0.868, 0.875, 0.879, 0.895, 0.884, 0.937, 0.890, 0.945, 0.912, 0.948, 0.910, 0.944, 0.933, 0.961, 0.950, 0.959, 1.000)
+
+win_per_table <- data.frame(spread, win_percentage)
+```
+
+## Win%, Totals, Spread
+Upcoming fixture with win%, Spread and Totals
+
+```{r message=FALSE}
+
+# Function to interpolate Win% for a given spread
+interpolate_win_percentage <- function(spread_val, win_per_table) {
+  # If spread greater than 19, return NA
+  if (spread_val > 19) {
+    return(NA_real_)
+  }
+  
+  lower_row <- win_per_table %>% filter(spread <= spread_val) %>% arrange(desc(spread)) %>% slice(1)
+  upper_row <- win_per_table %>% filter(spread > spread_val) %>% arrange(spread) %>% slice(1)
+  
+  if (nrow(lower_row) == 0) {
+    return(upper_row$win_percentage)
+  }
+  if (nrow(upper_row) == 0) {
+    return(lower_row$win_percentage)
+  }
+  
+  x1 <- lower_row$spread
+  y1 <- lower_row$win_percentage
+  x2 <- upper_row$spread
+  y2 <- upper_row$win_percentage
+  
+  # Interpolation formula
+  y = y1 + ((spread_val - x1) * (y2 - y1)) / (x2 - x1)
+  
+  return(y)
+}
+
+# Mutate upcoming_fix with the interpolated Win%
+upcoming_fix <- upcoming_fixture_predictions %>%
+  rowwise() %>%
+  mutate(WinPercentage = interpolate_win_percentage(abs(Spread),win_per_table ))
+
+datatable(upcoming_fix%>%mutate(Spread=round(Spread,2),
+                                WinPercentage= round(WinPercentage,2)*100
+                                ))
+
+```
+
+## Further Improvements
+Feature Engineering: As a new metrics taking the outcomes of the games (win/lose) and evaluation will help us to enhance the model performance better or the base score calculation better when the model is created for a actual vs predicted scores. To perform better features like Recent WinS treak, Recent Loss Streak, Win Rate Last5Games, Average Performance Score Last5Games, etc.
 
 
 

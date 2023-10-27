@@ -502,30 +502,6 @@ upcoming_fix <- upcoming_fixture_predictions %>%
 
 
 
-# Feature Engineering:
-#   
-# Create new features based on the outcomes of previous games. For instance, you can create features like RecentWinStreak, RecentLossStreak, WinRateLast5Games, AveragePerformanceScoreLast5Games, etc.
-# Incorporate the outcomes of the games (win/lose) to calculate new performance metrics for teams. 
-# This can include an updated average performance score, total wins, total losses, etc.
-# 
-# 
-# [Upcoming Match Data] -> [Score Estimation Model(s)] -> [Estimated Scores]
-# [Estimated Scores + Other Match Data] -> [Original Winner Prediction Model] -> [Predicted Outcome]
-# 
-# 
-#Your logistic regression model may not be well-calibrated. When a model is well-calibrated, the predicted probabilities 
-# can be directly interpreted. For instance, a predicted probability of 0.8 should correspond to 80% chances of 
-# the event occurring. 
-# he model is extremely confident about its predictions. 
-# This can be due to overfitting or certain features heavily influencing the model's decision boundary.
-
-
-#The model seems reasonably accurate for scores in the middle range but struggles more with extreme scores, both high and low.
-#There's a tendency for the model to underpredict especially high scores and possibly to overpredict especially low scores
-#The scatter might indicate that the model could benefit from additional complexity or feature engineering, especially to handle the extremes better.
-
-
-
 
 
 

@@ -24,8 +24,8 @@ Exploratory data analysis <br />
 [main.ipynb](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.ipynb)
 
 #### Working Directories 
+[Working App](https://vh3ewn-phnx0mod.shinyapps.io/cbbmodelrshiny/) <br />
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelPyDjango
-https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelRShiny
 
 ## 2.Exploratory data analysis
 The data((mydatabase.db) represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years. 

@@ -3,6 +3,7 @@ library(shinythemes)
 library(shinydashboard)
 library(DT)
 
+
 # library(rsconnect)
 # rsconnect::deployApp('path')
 
@@ -13,12 +14,12 @@ fluidPage(
     tags$style(
       HTML('
       #sidebar {
-        background-color: #d46ed4;
+        background-color: white;
       }
 
       body, label, input, button, select { 
         font-family: "Arial";
-        color: black;
+        color: #01132e;
       }
 
       .round-image {
@@ -29,19 +30,44 @@ fluidPage(
       .image-column {
         text-align: center;
       }
+      .custom-label-style label {
+      font-size: 15px;
+      font-style: italic;
+      }
+      
+      #my-heading {
+      background-color: #3498db; 
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center; 
+      }
+      
+      #HomeWinTable table, #HomelossTable table, #AwayWinTable table, #AwaylossTable table {
+      font-size: 13px;
+      width: 100% !important;
+      }
+      
+      .adjustTableBox .shiny-output-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+      
+      
     ')
     )
   ),
   
   
-  
   dashboardPage(
     skin = "red",
-    dashboardHeader(title = "NCAA model"),
+    dashboardHeader(title = "ML Project"),
     dashboardSidebar(
       dashboardSidebar(
         sidebarMenu(
-          menuItem("NCAA Model", tabName = "NcaaModel"),
+          menuItem("Prediction", tabName = "NcaaModel"),
           menuItem("Read Me",  tabName = "ReadMe"),
           menuItem("About Us", tabName = "AboutUS")),
         
@@ -51,26 +77,52 @@ fluidPage(
 #================tab item 1 =====================
       
       tabItems(tabItem(tabName = "NcaaModel",
-                       h1("NCAA score prediction model", style='
+                       h1("NCAA Score Prediction Model", style='
                        font-family: Impact, Charcoal, sans-serif;
-                       color: #FFFFFF;
+                       color: black;
                        background: #edeff2;
-                       text-shadow: 2px 2px 0 #004466, 
-                       2px -2px 0 #4074b5, 
-                       -2px 2px 0 #4074b5, 
-                       -2px -2px 0 #4074b5, 
-                       2px 0px 0 #4074b5, 
-                       0px 2px 0 #4074b5, 
-                       -2px 0px 0 #4074b5,
-                       0px -2px 0 #4074b5;
+                       text-shadow: 0.5px 0.5px 0 white, 
+                       2px -2px 0 white, 
+                       -2px 2px 0 white, 
+                       -2px -2px 0 white; 
                        text-align:center;
                           '),
                        p('Please read Read Me section'),
-                       box(h3("Home Last 5 Wins/Losses", style = "color:black; text-align:center"),
+                       fluidRow(
+                         column(width = 4, uiOutput('select_TeamNameHome'), align = "middle"),
+                         column(width = 4, 
+                                actionButton("PredictButton", 
+                                             "Predict", 
+                                             style = 'font-size:75%;height:35px;', 
+                                             class = "btn-primary", 
+                                             size = "large"), align="middle"
+                         ),
+                         column(width = 4, uiOutput('select_TeamNameAway'), align = "middle")
+                       ),
+                       # verbatimTextOutput('testText'),
+                       
+                       box(class = "adjustTableBox", width = 6,
+                           h3("Home Last Matches", style = "color:black; text-align:center"),
                            hr(style = "border-top: 1px solid #000000;"),
+                           
+                           tags$h4("Last 5 Wins", id = "my-heading"),
+                           tableOutput('HomeWinTable'),
+                           
+                           tags$h4("Last 5 Losses", id = "my-heading"),
+                           tableOutput('HomelossTable'),
+                           
                            collapsible = TRUE, status = 'primary'),
-                       box(h3("Away Last 5 Wins/Losses", style = "color:black; text-align:center"),
+                       
+                       box(class = "adjustTableBox", width = 6,
+                           h3("Away Last Matches", style = "color:black; text-align:center"),
                            hr(style = "border-top: 1px solid #000000;"),
+                           
+                           tags$h4("Last 5 Wins", id = "my-heading"),
+                           tableOutput('AwayWinTable'),
+                           
+                           tags$h4("Last 5 Losses", id = "my-heading"),
+                           tableOutput('AwaylossTable'),
+                           
                            collapsible = TRUE, status = 'info')
                        
                        ),

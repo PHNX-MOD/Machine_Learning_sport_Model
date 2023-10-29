@@ -8,83 +8,144 @@ library(caret)
 library(ggplot2)
 library(pROC)
 library(RSQLite)
+library(DT)
+
 
 
 
 write.fst(dfBoxScoresFromQuery, "dfBoxScoresFromQuery.fst", 100)
 
-Final_Score%>%rowwise()%>%
-  mutate(Date = strsplit(FixtureKey, " ")[[1]]
-         [length(strsplit(FixtureKey, " ")[[1]])])%>%
-  select(!FixtureKey)%>%
-  mutate(Date= as.Date(Date,  format="%d-%b-%Y"))%>%
-  arrange(desc(Date))
 
 
+# write.fst(Final_Score%>%rowwise()%>%
+#             mutate(Date = strsplit(FixtureKey, " ")[[1]]
+#                    [length(strsplit(FixtureKey, " ")[[1]])])%>%
+#             select(!FixtureKey)%>%
+#             mutate(Date= as.Date(Date,  format="%d-%b-%Y")),
+#           "Final_score.fst"
+#           )
+
+#=============team names ===============
+Team_names <- c( "A PEAY", "ABILCH", "AIRFOR", "AKRON", "AL A&M", "ALA ST", "ALA", "ALBANY", "ALCORN", 
+   "AMER", "APP ST", "ARIZ", "ARK PB", "ARK ST", "ARK", "ARMY", "AUBURN", "AZ ST", "BALLST", "BAYLOR", 
+   "BC", "BECOOK", "BELLAR", "BELMNT", "BGSU", "BINGHA", "BOISE", "BRAD", "BROWN", "BRYANT", "BU", "BUCKNL",
+   "BUFF", "BUTLER", "BYU", "C ARK", "C CONN", "C MICH", "C OF C", "CAL", "CALBAP", "CALPLY", "CAMPBL", 
+   "CANISI", "CHAR", "CHARSO", "CHAT", "CHI ST", "CINCY", "CITDEL", "CLE ST", "CLEM", "CO CAR", "CO ST", 
+   "COLGAT", "COLO", "COLUMB", "COPPIN", "CORN", "CREIGH", "CSFULL", "CSUBAK", "CSUN", "DART", "DAVID", 
+   "DAYTON", "DEL ST", "DEL", "DENVER", "DEPAUL", "DET", "DIXST", "DRAKE", "DREXEL", "DUKE", "DUQSNE",
+   "E CAR", "E ILL", "E KY", "E MICH", "E WASH", "ELON", "ETSU", "EVANS", "FAIR", "FAU", "FDU", "FGCU", "FIU",
+   "FL A&M", "FLA", "FORDHM", "FRESNO", "FSU", "FURMAN", "G WASH", "G WEBB", "GA SOU", "GA ST", "GATECH", "GCANYN", 
+   "GMU", "GONZ", "GRAMB", "GRNBAY", "GTOWN", "HAMPTN", "HARV", "HAWAII", "HIGHPT", "HOFSTR", "HOLYCR", "HOU", "HOUBAP",
+   "HOWARD", "HRTFRD", "ID ST", "IDAHO", "ILL ST", "ILL", "INCWRD", "IND ST", "IND", "IONA", "IOWA", "IOWAST", "IPFW", "IUPUI",
+   "JACKST", "JAX ST", "JMU", "JVILLE", "KAN ST", "KANSAS", "KENSAW", "KENT", "LA MON", "LAFAYE", "LAMAR", "LASALL", "LATECH", "LBSU", 
+   "LEHIGH", "LIBRTY", "LINWOD", "LIPSCO", "LIU BK", "LMU", "LONGWD", "LOUIS", "LOY MD", "LOYCHI", "LSU", "MAINE", "MANHAT", "MARIST", 
+   "MARQ", "MARSH", "MCNEES", "MD", "MEM", "MERCER", "MERMCK", "MIA OH", "MIAMI", "MICH", "MICHST", "MIDTEN", "MILWKE", "MINN", "MISS", 
+   "MISSST", "MIZZOU", "MO ST", "MONMTH", "MONT", "MONTST", "MOREST", "MORGAN", "MS VAL", "MTSTMY", "MURRAY", "N ALA", "N COLO", "N DAME", 
+   "N IOWA", "N KY", "N MEX", "NAU", "NAVY", "NC A&T", "NC CEN", "NC ST", "ND ST", "NEB", "NEVADA", "NIAGRA", "NICHST", "NIU", "NJIT", "NM ST", 
+   "NO DAK", "NO FLA", "NO TEX", "NOEAST", "NORFLK", "NOVA", "NW ST", "NWSTRN", "OAK", "ODU", "OHIO", "OHIOST", "OKLA", "OKLAST", "OMAHA", "ORE ST", 
+   "OREGN", "ORU", "PACIF", "PENN", "PENNST", "PEPPER", "PITT", "PORT", "PORTST", "PRESBY", "PRINCE", "PROV", "PURDUE", "PV A&M", "QUENNC", "QUINN", 
+   "RADFRD", "RICE", "RICH", "RIDER", "ROBMOR", "RUTGER", "S ALA", "S CAR", "S FRAN", "S IND", "S MISS", "S UTAH", "SAC ST", "SACHRT", "SAMFRD", "SAMHOU", 
+   "SC ST", "SC UPS", "SDAKST", "SDSU", "SE LA", "SEATTL", "SEMO", "SETON", "SFA", "SIENA", "SIU", "SIUE", "SJSU", "SMU", "SO DAK", "SOUTHR", "ST LOU",
+   "ST PTR", "STAN", "STBONA", "STCLAR", "STETSN", "STFRBK", "STFRPA", "STJOES", "STJOHN", "STMARY", "STONEH", "STONY", "STTHOM", "SYR", "TAMUCC",
+   "TAMUCO", "TARLET", "TCU", "TEMPLE", "TENN", "TENNST", "TEXAS", "TNTECH", "TOLEDO", "TOWSON", "TROY", "TULANE", "TULSA", "TX A&M", "TX ARL", "TX SOU",
+   "TX ST", "TXTECH", "UAB", "UALR", "UC DAV", "UC IRV", "UC RIV", "UCF", "UCLA", "UCONN", "UCSB", "UCSD", "UGA", "UIC", "UK", "ULL", "UMASS", "UMASSL",
+   "UMBC", "UMES", "UMKC", "UNC A", "UNC G", "UNC", "UNCW", "UNH", "UNLV", "UNO", "URI", "USC", "USD", "USF", "UT MAR", "UT ST", "UT VAL", "UTAH", "UTEP", 
+   "UTRGV", "UTSA", "UVA", "VALPO", "VANDY", "VCU", "VERMNT", "VMI", "VT", "W CAR", "W ILL", "W KY", "W MICH", "WAGNER", "WAKE", "WASH", "WASHST", 
+   "WEB ST", "WICHST", "WINTHR", "WISC", "WM&MRY", "WOFFRD", "WRIGHT", "WVU", "WYO", "XAVIER", "YALE", "YSU" )
+
+#=============team names ===============
+
+
+
+get_team_spread_data <- function(team_name, team_column, spread_condition) {
+  
+  data <- read.fst("Final_score.fst") %>%
+    mutate(spread = Home_score - Away_score) %>%
+    filter(!!sym(team_column) == team_name)
+  
+  if(spread_condition == "greater") {
+    result <- data %>%
+      filter(spread > 0)
+  } else if(spread_condition == "lesser") {
+    result <- data %>%
+      filter(spread < 0)
+  } else {
+    stop("Invalid spread_condition. Choose either 'greater' or 'lesser'.")
+  }
+  
+  return(result)
+}
+  
 
 
 function(input, output, session) {
-  con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
-  dfBoxScoresFromQuery <- dbGetQuery(con, query)
-  dbDisconnect(con)
   
   
-  fiter_box_scoreFun <- function(df){
-    df%>%rowwise()%>%
-      mutate(Date = strsplit(FixtureKey, " ")[[1]]
-             [length(strsplit(FixtureKey, " ")[[1]])])%>%
-      mutate(Day = weekdays(as.Date(Date, format="%d-%b-%Y")))%>%
-      mutate(
-        HomeTeamAdv = 
-          if(HomeTeamAdv =="Yes" & IsNeutralSite == 0){
-            "Yes"
-          } else if (HomeTeamAdv =="No" & IsNeutralSite == 1) {
-            "No"
-          } else if (HomeTeamAdv =="Yes" & IsNeutralSite == 1) {
-            "No"
-          } else if (HomeTeamAdv =="No" & IsNeutralSite == 0) {
-            "No"
-          }
-      )%>%
-      #adding home advantage factor
-      mutate(HomeTeamAdv = ifelse(HomeTeamAdv == "Yes", 1, 0) * 0.05)%>%
-      #calculating base score
-      mutate(Base_score = ((`FG%`*0.3) + (`3P%`*0.2)+(`FT%`*0.1)+(`ASTtoTOV%`*0.2)+
-                             (ORD*0.05)+(DRD*0.05)+(STLAvg*0.03)+(BLKAvg*0.02)+(DiffPFAvg*0.03)+HomeTeamAdv))%>%
-      #adding attendance factor
-      mutate(Base_score = Base_score*ifelse(Attendance == 0, 1, 1+0.05*(Attendance/max(Attendance))))%>%
-      #adding home GameType factor
-      mutate(Base_score = case_when(
-        GameType == "RegularSeason" ~ 1.0*Base_score,
-        GameType == "ConferenceChampionship" ~ 1.1*Base_score,
-        GameType == "NIT" ~ 1.2*Base_score,
-        TRUE ~ 1.0*Base_score))%>%
-      mutate(time_multiplier = as.integer(strsplit(TipOff[1],":")[[1]][1]))%>%
-      mutate(Base_score = case_when(
-        time_multiplier >= 6 & time_multiplier < 12 ~ 0.98*Base_score,
-        time_multiplier >= 12 & time_multiplier < 17 ~ 1*Base_score,
-        time_multiplier >= 17 & time_multiplier < 21 ~ 1.02*Base_score,
-        TRUE ~ 1.01*Base_score
-      ))%>%mutate(Base_score = case_when(
-        Day == "Monday"~ 1.0*Base_score,
-        Day == "Tuesday"~ 1.0*Base_score,
-        Day == "Wednesday"~ 1.0*Base_score,
-        Day == "Thursday"~ 1.0*Base_score,
-        Day == "Friday"~ 1.01*Base_score,
-        Day == "Saturday"~ 1.02*Base_score,
-        Day == "Sunday"~ 1.01*Base_score
-      ))%>%select(FixtureKey, TeamName,Oppnent,Base_score)
-  }
+  
+  output$select_TeamNameHome <- renderUI({
+    div(class = "custom-label-style", 
+        selectInput('SelectTeamNameHome', 'Select Home', Team_names, width = '150px')
+    )
+  })
+  
+  output$select_TeamNameAway <- renderUI({
+    div(class = "custom-label-style", 
+        selectInput('SelectTeamNameAway', 'Select Away', Team_names, width = '150px')
+    )
+    })
+  
+  output$HomeWinTable <- renderTable({
+    head(rbind(get_team_spread_data(input$SelectTeamNameHome, "Home", "lesser"),
+               get_team_spread_data(input$SelectTeamNameHome, "Away", "lesser"))%>%
+           arrange(desc(Date)),5)%>%mutate(Date = as.character(Date))%>%
+      rename("Home score" = Home_score, 'Away score' =Away_score)%>%
+      select(Date, Home, Away, "Home score", 'Away score')%>%mutate(Result =c("Win"))
+  })
+  
+  output$HomelossTable <- renderTable({
+    head(rbind(get_team_spread_data(input$SelectTeamNameHome, "Home", "greater"),
+               get_team_spread_data(input$SelectTeamNameHome, "Away", "greater"))%>%
+           arrange(desc(Date)),5)%>%mutate(Date = as.character(Date))%>%
+      rename("Home score" = Home_score, 'Away score' =Away_score)%>%
+      select(Date, Home, Away, "Home score", 'Away score')%>%mutate(Result =c("Loss"))
+  })
+  
+  
+   output$AwayWinTable <- renderTable({
+     head(rbind(get_team_spread_data(input$SelectTeamNameAway, "Home", "lesser"),
+                get_team_spread_data(input$SelectTeamNameAway, "Away", "lesser"))%>%
+            arrange(desc(Date)),5)%>%mutate(Date = as.character(Date))%>%
+       rename("Home score" = Home_score, 'Away score' =Away_score)%>%
+       select(Date, Home, Away, "Home score", 'Away score')%>%mutate(Result =c("Win"))
+  })
+   
+   output$AwaylossTable <- renderTable({
+     rbind(get_team_spread_data(input$SelectTeamNameAway, "Home", "greater"),
+                   get_team_spread_data(input$SelectTeamNameAway, "Away", "greater"))%>%
+       arrange(desc(Date)) %>% mutate(Date = as.character(Date))%>%
+       head(5) %>%
+       mutate(Date = as.character(Date))%>%rename("Home score" = Home_score, 'Away score' =Away_score)%>%
+       select(Date, Home, Away, "Home score", 'Away score')%>%mutate(Result =c("Loss"))
+
+   })
+   
+   
+   
   
   
   output$sean_image <- renderImage({
     list(src = "sean_image.jpg",
          alt = "Sean Mulvilhill",
-         width = 250, height = 250) # Adjust width and height as needed
+         width = 250, height = 250) 
   }, deleteFile = FALSE)
   
+  
+  
+  
+  
+  
+  
 }
-
 
 
 

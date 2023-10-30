@@ -55,6 +55,22 @@ fluidPage(
         height: 100%;
       }
       
+     
+      .small-box { height: 95px;}
+      
+      .small-box .icon { font-size: 17px; }
+      
+      .small-box h3 { font-size: 27px; }
+      
+      .small-box p {font-size: 17px; }
+      
+      #PredictedOverall {
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+      
+      
       
     ')
     )
@@ -77,7 +93,7 @@ fluidPage(
 #================tab item 1 =====================
       
       tabItems(tabItem(tabName = "NcaaModel",
-                       h1("NCAA Score Prediction Model", style='
+                       h1("NCAA Prediction Model", style='
                        font-family: Impact, Charcoal, sans-serif;
                        color: black;
                        background: #edeff2;
@@ -87,7 +103,7 @@ fluidPage(
                        -2px -2px 0 white; 
                        text-align:center;
                           '),
-                       p('Please read Read Me section'),
+                       p('Please read Read Me section', ),
                        fluidRow(
                          column(width = 4, uiOutput('select_TeamNameHome'), align = "middle"),
                          column(width = 4, 
@@ -99,7 +115,34 @@ fluidPage(
                          ),
                          column(width = 4, uiOutput('select_TeamNameAway'), align = "middle")
                        ),
+                       
+                       hr(style = "border-top: 1px solid #000000;"),
+                       
+                       #tableOutput('testdataframe'),
                        # verbatimTextOutput('testText'),
+                       
+                       textOutput('PredictedOverall'), br(),
+                       
+                                              
+                       fluidRow(
+                         valueBoxOutput("PredictedHomeScore"),
+                         valueBoxOutput("PredictedAwayScore"),
+                         valueBoxOutput('PredictedSpreadTotal')
+                                 ),
+                       
+                       
+                       
+                       box(h3("Score Distribution (Home)", style = "color:black; text-align:center"),
+                           hr(style = "border-top: 1px solid #000000;"),
+                           plotOutput('DistFunGraphHome'),
+                           collapsible = TRUE, status = 'primary'),
+                       
+                       box(h3("Score Distribution (Away)", style = "color:black; text-align:center"),
+                           hr(style = "border-top: 1px solid #000000;"),
+                           plotOutput('DistFunGraphAway'),
+                           collapsible = TRUE, status = 'primary'),
+                       
+                       
                        
                        box(class = "adjustTableBox", width = 6,
                            h3("Home Last Matches", style = "color:black; text-align:center"),
@@ -129,7 +172,60 @@ fluidPage(
                
                #================tab item 2 =====================               
                tabItem(tabName = "ReadMe",
-                       p("Select 'Select Input Date' or 'Select Weeks/Months' and click search here first", style='color:black;')
+                       h1("Read Me to understand what we are upto!", style='
+                       font-family: Impact, Charcoal, sans-serif;
+                       color: black;
+                       background: #edeff2;
+                       text-shadow: 0.5px 0.5px 0 white, 
+                       2px -2px 0 white, 
+                       -2px 2px 0 white, 
+                       -2px -2px 0 white; 
+                       text-align:center;
+                          '), 
+                       p("The Appliction itself is an example app how our final model would look like. The objective is to present the project which operates like a research paper, encompassing all stages of model development, 
+                       starting from data acquisition and concluding with the presentation of the findings. 
+                       The paper deals with analysing the disparities between a traditional model and a model that relies on the outcomes influenced by various teams' performance 
+                       in different quarters of a specific basketball league", br(),br(),"
+                       In our preliminary analysis, the predictive model is developed based on exploratory data and is thus relatively rudimentary, resulting in a lower confidence in score calculations. 
+                       While the user interface of the primary model will likely resemble the current prototype,
+                       it's worth noting that the exploratory data analysis (EDA) stage, from which this model emanates, 
+                       is inherently a provisional step in our research framework. Consequently, we've adopted a basic regression model without extensive evaluation or calibration, given that our primary research objective lies elsewhere. Interestingly, the prediction model exhibits a high degree of confidence in its outcomes. This heightened confidence might be attributed to potential overfitting or specific features disproportionately shaping the model's decision-making process. 
+                       A fundamental concern is that the foundational score computations derive from variables characterized by limited confidence.",br(),br(),"
+                       The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 
+                       The overarching goal is to create a predictive model capable of unveiling the intricate relationship between various game-related 
+                       features and the elusive outcomes of basketball matches. In pursuit of this objective, the algorithm is meticulously crafted using two 
+                       of the most potent programming languages in data science and analysis, Python and R. The algorithm's reach extends beyond its technical prowess, 
+                       as it offers seamless access through both Shiny and Django frameworks, providing a user-friendly front-end interface that empowers enthusiasts, 
+                       analysts, and decision-makers to harness the insights buried within the data.", 
+                         style='color:black; border: 2px solid #fafcff; font-family: Georgia, serif; font-size: 16px; letter-spacing: 2px; word-spacing: 2px;'),
+                       
+                       h3("Links", style='
+                       font-family: Impact, Charcoal, sans-serif;
+                       color: black;
+                       background: #edeff2;
+                       text-shadow: 0.5px 0.5px 0 white, 
+                       2px -2px 0 white, 
+                       -2px 2px 0 white, 
+                       -2px -2px 0 white; 
+                       text-align:center;
+                          '),
+                       
+                       a(href = "https://github.com/PHNX-MOD/Machine_Learning_sport_Model", 
+                         style = "color:black; text-align: center; font-family: Georgia, serif; font-size: 16px; letter-spacing: 2px; word-spacing: 2px;", 
+                         "Link to the code (GitHub)"), br(),
+                       
+                       a(href = "https://phnx-mod.github.io/Machine_Learning_sport_Model/", 
+                         style = "color:black; text-align: center; font-family: Georgia, serif; font-size: 16px; letter-spacing: 2px; word-spacing: 2px;", 
+                         "Link to the base model report"),br(),
+                       
+                       a(href = "https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.R", 
+                         style = "color:black; text-align: center; font-family: Georgia, serif; font-size: 16px; letter-spacing: 2px; word-spacing: 2px;", 
+                         "Link to the main R code"),br(),
+                       
+                       a(href = "https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/main.ipynb", 
+                         style = "color:black; text-align: center; font-family: Georgia, serif; font-size: 16px; letter-spacing: 2px; word-spacing: 2px;", 
+                         "Link to the main python code"),br(),
+                       
                ),
                #================tab item 3 =====================
                tabItem(tabName = "AboutUS",

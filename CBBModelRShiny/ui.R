@@ -103,7 +103,7 @@ fluidPage(
                        -2px -2px 0 white; 
                        text-align:center;
                           '),
-                       p('Please read Read Me section', ),
+                       p('Please read Read Me section'),
                        fluidRow(
                          column(width = 4, uiOutput('select_TeamNameHome'), align = "middle"),
                          column(width = 4, 
@@ -235,11 +235,17 @@ fluidPage(
                            h3("Modith Hadya", style = "color:black; text-align:center"),
                            hr(style = "border-top: 1px solid #000000;"),
                            p("Someone who is a data-driven, who likes to solve problems through coding and 
-                             also someone who is driven by intellectual curiosity to solve pressing problems. 
-                             I have experience in developing dashboards using R & shiny as well as Python(Django). 
-                             I can coordinate among the subordinates and indulge in continuous learning new skills,
-                             technologies and able to function very well as a valued team member and 
-                             to collaborate with others as well as work independently.", style='color:#002B80;'),
+                             also someone who is driven by intellectual curiosity to solve pressing problems. I have experience working with 
+                             both front-end & back-end technologies. I am aware of relational & non-relational databasesm Data visualization tools, 
+                             code in both R & Python, MS office, Linux OS, Git and Machine learning models when it comes to data analystics. 
+                             I have experience in developing dashboards using R & shiny as well as in Python(Django).", style='color:#002B80;'),br(),
+                           
+                           a(href = "https://www.linkedin.com/in/modith-hadya/", 
+                             style = "color:black; text-align: center; font-family: Georgia, serif; font-size: 16px; letter-spacing: 2px; word-spacing: 2px;", 
+                             "Right Swipe me at LinkedIn"),
+                           
+                           
+                           h3("",imageOutput("modith_image"), style = "color:black; text-align:center"),
          
                            collapsible = TRUE, status = 'warning'
                          ),
@@ -250,7 +256,11 @@ fluidPage(
                                Python, PowerBI and Excel to gain data insight that can drive business operations through 
                                data focused solutions. My previous experiences have given me knowledge in the areas
                                of iGaming, machine learning models and relational databases through various different
-                               # analytical projects.",style='color:#002B80; text-align:center'),
+                               # analytical projects.",style='color:#002B80;'),br(),br(),
+                             
+                             a(href = "https://www.linkedin.com/in/se%C3%A1n-mulvihill-448870197/", p("Like and Subscribe me in LinkedIn"),
+                               style = "color:black; align: center; font-family: Georgia, serif; font-size: 16px; letter-spacing: 2px; word-spacing: 2px;"),
+                           
                              h3("",imageOutput("sean_image"), style = "color:black; text-align:center"),
                              collapsible = TRUE, status = 'primary'),
                        )

@@ -10,7 +10,7 @@ library(RSQLite)
 
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
-dbDisconnect(con)
+
 
 
 #Data Preparation
@@ -66,10 +66,6 @@ dfBoxScores2 <- df_box_scores %>%rowwise()%>%
 
 
 con <- dbConnect(RSQLite::SQLite(), "mydatabase.db")
-
-
-dbExecute(con, createTemp2Table)
-dbGetQuery(con, qurt1)
 
 #==========================================================query======================
 
@@ -176,6 +172,8 @@ JOIN Query1 AS Query3 ON Query2.Oppnent = Query3.TeamName
 #==========================================================queryEND======================
 
 dfBoxScoresFromQuery <- dbGetQuery(con, qurt1)
+
+dbDisconnect(con)
 
 
 fiter_box_scoreFun <- function(df){

@@ -103,7 +103,8 @@ fluidPage(
                        -2px -2px 0 white; 
                        text-align:center;
                           '),
-                       p('Please read Read Me section'),
+                       p("Please select home and away teams from the dropdowns and click predict button",
+                         style='font-family: Impact sans-serif;text-align:center;'),
                        fluidRow(
                          column(width = 4, uiOutput('select_TeamNameHome'), align = "middle"),
                          column(width = 4, 
@@ -182,7 +183,7 @@ fluidPage(
                        -2px -2px 0 white; 
                        text-align:center;
                           '), 
-                       p("The Appliction itself is an example app how our final model would look like. The objective is to present the project which operates like a research paper, encompassing all stages of model development, 
+                       p("There is an obvious error in the winner prediction as The winner prediction model here is extremely confident in its predictions compare to the score prediction, this is due to overfitting or certain features heavily influencing the model’s decision boundary The Appliction itself is an example app how our final model would look like. The objective is to present the project which operates like a research paper, encompassing all stages of model development, 
                        starting from data acquisition and concluding with the presentation of the findings. 
                        The paper deals with analysing the disparities between a traditional model and a model that relies on the outcomes influenced by various teams' performance 
                        in different quarters of a specific basketball league", br(),br(),"
@@ -258,7 +259,7 @@ fluidPage(
                                of iGaming, machine learning models and relational databases through various different
                                # analytical projects.",style='color:#002B80;'),br(),br(),
                              
-                             a(href = "https://www.linkedin.com/in/se%C3%A1n-mulvihill-448870197/", p("Like and Subscribe me in LinkedIn"),
+                             a(href = "https://www.linkedin.com/in/se%C3%A1n-mulvihill-448870197/", p("LInKEdin and Subscribe me"),
                                style = "color:black; align: center; font-family: Georgia, serif; font-size: 16px; letter-spacing: 2px; word-spacing: 2px;"),
                            
                              h3("",imageOutput("sean_image"), style = "color:black; text-align:center"),

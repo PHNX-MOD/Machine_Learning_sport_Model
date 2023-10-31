@@ -9,6 +9,8 @@ library(ggplot2)
 library(pROC)
 library(RSQLite)
 library(DT)
+library(RDS)
+library(fst)
 
 
 
@@ -51,33 +53,17 @@ interpolate_win_percentage <- function(spread_val, win_per_table) {
 }
 
 
+Away_recipe <- readRDS("Away_recipe.rds")
+Home_recipe <- readRDS("Home_recipe.rds")
+model_home <- readRDS("model_home.rds")
+model_away <- readRDS("model_away.rds")
+training_recipe <- readRDS("training_recipe.rds")
 
-# write.fst(Final_Score%>%rowwise()%>%
-#             mutate(Date = strsplit(FixtureKey, " ")[[1]]
-#                    [length(strsplit(FixtureKey, " ")[[1]])])%>%
-#             select(!FixtureKey)%>%
-#             mutate(Date= as.Date(Date,  format="%d-%b-%Y")),
-#           "Final_score.fst"
-#           )
+winner_prediction_model <- readRDS('winner_prediction_model.rds')
+dfboxscoresMean <- read.fst("dfboxscoresMean.fst")
 
-# saveRDS(Away_recipe, "Away_recipe.rds")
-# saveRDS(model, "lm_model.rds")
-
-
-# Away_recipe <- readRDS("Away_recipe.rds")
-# loaded_model <- readRDS("lm_model.rds")
-
-# saveRDS(Away_recipe, "Away_recipe.rds")
-# saveRDS(Home_recipe, "Home_recipe.rds")
-
-
-# saveRDS(model_home, "model_home.rds")
-# saveRDS(model_away, "model_away.rds")
-
-#processed_Away_data <- juice(Away_recipe)
-
-#winner_prediction_model
-
+processed_Away_data <- juice(Away_recipe)
+processed_Home_data <- juice(Home_recipe)
 
 
 #=============team names ===============

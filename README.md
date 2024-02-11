@@ -172,3 +172,13 @@ from getNBAScoreBoard import GetScoreBoard
 ```
 
 
+## Authors 
+ - Modith Hadya, MSc in Mechatronics, BTech in Automobile, Systems Analyst in Pinnacle
+ - Seán Mulvihill, Technological University Dublin, Bachelor of Science - BS (Hons), Physics Technology
+
+
+## License
+[MIT License](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/LICENSE)
+
+
+

@@ -142,4 +142,30 @@ The set of FixtureKeys on the 25th of February, 2023, to predict the fixture out
 This data shows what actually happened for the fixtures to predict, as well as some additional betting information provided by bookmakers. (Guide on TeamHandicap: -7.0
 would mean that the team was predicted to win by 7 points, and +3.5 would mean that the team was predicted to lose by 3.5 points.)
 
+## 3.Main Data
+The cornerstone of our research lies in leveraging data obtained from the NBA API, which serves as the primary dataset for developing and refining our analytical model. Through meticulous analysis and interpretation of this data, we construct a robust model that encapsulates the intricate dynamics of basketball gameplay, facilitating insightful insights and informed decision-making within the realm of sports analytics.
+
+### 3.a Dataset extraction
+NBA dataset is extracted using nba-api installing !pip install nba_api in Python. NBA API is huge pool dataset. 
+[getNBAScoreBoard.py](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/getNBAScoreBoard.py) file gives a overview on the exploration of the data which is needed for the modelling. 
+
+```
+if __name__ == "__main__":
+    # Example usage
+    year = 2018  # Example year
+    scoreboard = GetScoreBoard(year)
+
+    # Call methods as needed
+    dates = scoreboard.getDates()
+    print("Game dates:", dates)
+
+    gameDate = '2018-11-13'  # Example date
+    day_score_df, load_scoreboard = scoreboard.getDayScore(gameDate)
+    print("Day score DataFrame:", day_score_df)
+    print("Loaded scoreboard:", load_scoreboard)
+
+    scoreboard_df = scoreboard.getScoreBoard()
+    print("Scoreboard DataFrame:", scoreboard_df)
+```
+
 

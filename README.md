@@ -6,9 +6,9 @@ The paper deals with analysing the disparities between a traditional model and a
 **IN PROGRESS(currently working): Exploratory data analysis**
 
 # Table of Contents
-[1.About](#About) <br />
-[2.Exploratory data analysis](#Exploratory-data-analysis) <br />
-[3.Main Data](#Main-Data) <br />
+[About](#About) <br />
+[Exploratory data analysis](#Exploratory-data-analysis) <br />
+[Main Data](#Main-Data) <br />
 [Authors](#Authors) <br />
 
 ## 1.About

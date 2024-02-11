@@ -11,7 +11,7 @@ The paper deals with analysing the disparities between a traditional model and a
 [Main Data](#Main-Data) <br />
 [Authors](#Authors) <br />
 
-## 1.About
+## About
 The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 
 The overarching goal is to create a predictive model capable of unveiling the intricate relationship between various game-related features and the elusive outcomes of basketball matches. In pursuit of this objective, the algorithm is meticulously crafted using two of the most potent programming languages in data science and analysis, Python and R.
 
@@ -29,7 +29,7 @@ Exploratory data analysis <br />
 [Working App](https://vh3ewn-phnx0mod.shinyapps.io/cbbmodelrshiny/) <br />
 https://github.com/PHNX-MOD/Machine_Learning_sport_Model/tree/main/CBBModelPyDjango
 
-## 2.Exploratory data analysis
+## Exploratory data analysis
 The data((mydatabase.db) represents various fixture-level college basketball (NCAA Basketball / which is added to the database (mydatabase.db)) statistics from the past 2 years. 
 The objective will be to build a model that is able to predict the winners for the fixtures on the SPECIFC DATE (**/**/****). Details of the dataset contents and goal is discussed in the section [2.c Datasets contents](#Datasets-contents)
 
@@ -144,7 +144,7 @@ The set of FixtureKeys on the 25th of February, 2023, to predict the fixture out
 This data shows what actually happened for the fixtures to predict, as well as some additional betting information provided by bookmakers. (Guide on TeamHandicap: -7.0
 would mean that the team was predicted to win by 7 points, and +3.5 would mean that the team was predicted to lose by 3.5 points.)
 
-## 3.Main Data
+## Main Data
 The cornerstone of our research lies in leveraging data obtained from the NBA API, which serves as the primary dataset for developing and refining our analytical model. Through meticulous analysis and interpretation of this data, we construct a robust model that encapsulates the intricate dynamics of basketball gameplay, facilitating insightful insights and informed decision-making within the realm of sports analytics.
 
 ### 3.a Dataset extraction

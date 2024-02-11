@@ -7,7 +7,9 @@ The paper deals with analysing the disparities between a traditional model and a
 
 # Table of Contents
 [1.About](#About) <br />
-[2.Exploratory data analysis](#Exploratory-data-analysis)
+[2.Exploratory data analysis](#Exploratory-data-analysis)<br />
+[3.Main Data](#Main-Data)<br />
+[Authors](#Authors)<br />
 
 ## 1.About
 The aim is to create a machine-learning model using Python and R with front-end access using Shiny and Django frameworks. 

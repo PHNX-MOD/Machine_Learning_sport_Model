@@ -38,7 +38,7 @@ class GetScoreBoard:
 
     #get all the games/scores in the list of dates given 
     def getScoreBoard(self):
-        dates = self.getDates()[:3]
+        dates = self.getDates()
         empty_dataframe = pd.DataFrame()
         for n in range(len(dates)):
           df = self.getDayScore(dates[n])[0]

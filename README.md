@@ -150,7 +150,10 @@ NBA dataset is extracted using nba-api installing !pip install nba_api in Python
 [getNBAScoreBoard.py](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/getNBAScoreBoard.py) file gives a overview on the exploration of the data which is needed for the modelling. 
 
 ```
-if __name__ == "__main__":
+#import GetScoreBoard from getNBAScoreBoard.py
+from getNBAScoreBoard import GetScoreBoard 
+
+
     # Example usage
     year = 2018  # Example year
     scoreboard = GetScoreBoard(year)

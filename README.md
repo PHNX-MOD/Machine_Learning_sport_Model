@@ -173,7 +173,7 @@ from getNBAScoreBoard import GetScoreBoard
 
 
 ## Authors 
- - Modith Hadya, MSc in Mechatronics, BTech in Automobile, Systems Analyst in Pinnacle
+ - Modith Hadya, MSc in Mechatronics, BTech in Automobile, Working as Systems Analyst in Pinnacle
  - Seán Mulvihill, Technological University Dublin, Bachelor of Science - BS (Hons), Physics Technology
 
 

@@ -3,7 +3,7 @@
 The objective is to present the project which operates like a research paper, encompassing all stages of model development, starting from data acquisition and concluding with the presentation of the findings.
 The paper deals with analysing the disparities between a traditional model and a model that relies on the outcomes influenced by various teams' performance in different quarters of a specific basketball league.
 
-**IN PROGRESS(currently working): Exploratory data analysis**
+**IN PROGRESS(currently working): Refer section before [Authors](#Authors)
 
 # Table of Contents
 [About](#About) <br />

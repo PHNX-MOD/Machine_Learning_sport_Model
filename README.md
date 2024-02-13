@@ -148,7 +148,7 @@ would mean that the team was predicted to win by 7 points, and +3.5 would mean t
 The cornerstone of our research lies in leveraging data obtained from the NBA API, which serves as the primary dataset for developing and refining our analytical model. Through meticulous analysis and interpretation of this data, we construct a robust model that encapsulates the intricate dynamics of basketball gameplay, facilitating insightful insights and informed decision-making within the realm of sports analytics.
 
 ### 3.a Dataset extraction
-NBA dataset is extracted using nba-api installing !pip install nba_api in Python. NBA API is huge pool dataset. 
+NBA dataset is extracted using nba-api installing !pip install nba_api in Python. NBA API is huge pool of dataset. 
 [getNBAScoreBoard.py](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/getNBAScoreBoard.py) file gives a overview on the exploration of the data which is needed for the modelling. 
 
 ```

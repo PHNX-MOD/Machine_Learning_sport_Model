@@ -150,7 +150,7 @@ The cornerstone of our research lies in leveraging data obtained from the NBA AP
 ### 3.a Dataset extraction
 
 The NBA dataset is acquired using the nba-api library by installing it with the command !pip install nba_api in Python. The NBA API provides access to a vast pool of dataset. 
-The endpoints used in the GetScoreBoard (getNBAScoreBoard.py) is ScoreboardV2 (nba_api/stats/endpoints/scoreboardv2.py).
+The endpoint used in the GetScoreBoard (getNBAScoreBoard.py) is ScoreboardV2 (nba_api/stats/endpoints/scoreboardv2.py).
 The [getNBAScoreBoard.py](https://github.com/PHNX-MOD/Machine_Learning_sport_Model/blob/main/getNBAScoreBoard.py) file offers an overview of the data exploration necessary for modeling. <br />
 
 The GetScoreBoard class in this file contains methods such as getDates(), which retrieves all NBA game dates for a specific year by passing the year as an argument to the class instance (e.g., GetScoreBoard('2018')). Using the list of dates obtained from getDates(), the getDayScore(gameDate) method facilitates the retrieval of all games played on a particular day by passing the date as an argument (e.g., getDayScore('2018-11-13')).<br />
